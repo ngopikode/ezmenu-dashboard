@@ -2,19 +2,16 @@
 
 namespace App\Traits;
 
-use Carbon\Carbon;
+use App\Helpers\TelegramHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Random\RandomException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Throwable;
 
 /**
  * Trait ApiResponserTrait
  *
- * Standardized API response structure and error reporting handler for DiGasss.
+ * Standardized API response structure.
  *
  * @package App\Traits
  */
@@ -23,10 +20,10 @@ trait ApiResponserTrait
     /**
      * Return a success JSON response.
      *
-     * @param mixed $data The payload to return.
-     * @param string $message Custom success message.
-     * @param int $code HTTP Status code (default 200).
-     * @param array $headers Additional HTTP headers.
+     * @param mixed $data
+     * @param string $message
+     * @param int $code
+     * @param array $headers
      * @return JsonResponse
      */
     protected function successResponse(
@@ -51,11 +48,10 @@ trait ApiResponserTrait
 
     /**
      * Return a client error JSON response (4xx range).
-     * Does NOT report to Telegram.
      *
-     * @param mixed $errors Validation errors or error details.
-     * @param int $code HTTP Status code (default 422).
-     * @param string|null $message Custom error message.
+     * @param mixed $errors
+     * @param int $code
+     * @param string|null $message
      * @return JsonResponse
      */
     protected function failResponse(
@@ -73,14 +69,13 @@ trait ApiResponserTrait
     }
 
     /**
-     * Return a server error JSON response (5xx range) and report to Telegram.
+     * Return a server error JSON response (5xx range) and triggers Telegram Helper.
      *
-     * @param mixed $errors The exception object or error array.
-     * @param string $message Generic error message for the user.
-     * @param int $code HTTP Status code (default 500).
-     * @param Request|null $request The current request instance.
+     * @param mixed $errors
+     * @param string $message
+     * @param int $code
+     * @param Request|null $request
      * @return JsonResponse
-     * @throws RandomException
      */
     protected function errorResponse(
         mixed   $errors = [],
@@ -89,15 +84,8 @@ trait ApiResponserTrait
         Request $request = null
     ): JsonResponse
     {
-        $requestId = $this->reportToTelegram($message, $request, $errors, $code);
-
-        $debugData = ($errors instanceof Throwable) ? [
-            'class' => get_class($errors),
-            'file' => $errors->getFile(),
-            'line' => $errors->getLine(),
-            'message' => $errors->getMessage(),
-            'trace' => $errors->getTrace() // Optional: remove if payload is too heavy
-        ] : $errors;
+        // Memanggil Static Method dari Class Helpers
+        $requestId = TelegramHelper::reportToTelegram($errors, $request, $message, $code);
 
         $response = [
             'success' => false,
@@ -106,77 +94,15 @@ trait ApiResponserTrait
             'request_id' => $requestId,
         ];
 
-        if (config('app.debug')) {
-            $response['debug'] = $debugData;
+        if (config('app.debug') && ($errors instanceof Throwable)) {
+            $response['debug'] = [
+                'class' => get_class($errors),
+                'file' => $errors->getFile(),
+                'line' => $errors->getLine(),
+                'message' => $errors->getMessage(),
+            ];
         }
 
         return response()->json($response, $code);
-    }
-
-    /**
-     * Internal helper to send error details to Telegram.
-     *
-     * @param string $message
-     * @param Request|null $request
-     * @param mixed $errors
-     * @param int $code
-     * @return string The generated Request ID.
-     * @throws RandomException
-     */
-    private function reportToTelegram(
-        string   $message,
-        ?Request $request,
-        mixed    $errors,
-        int      $code
-    ): string
-    {
-        $requestId = 'ERR-' . Carbon::now()->format('YmdHis') . '-' . bin2hex(random_bytes(4));
-
-        try {
-            if (!$request) {
-                $request = request();
-            }
-
-            $user = $request->user();
-            $userInfo = $user ? "ID: $user->id ($user->name)" : "Guest";
-
-            $fileInfo = "";
-
-            if ($errors instanceof Throwable) {
-                $errorDetail = $errors->getMessage();
-                $fileInfo = "\n📂 <b>File:</b> " . basename($errors->getFile()) . ":{$errors->getLine()}";
-            } elseif (is_array($errors) || is_object($errors)) {
-                $errorDetail = json_encode($errors);
-            } else {
-                $errorDetail = (string)$errors;
-            }
-
-            $text = "🚨 <b>CRITICAL ERROR REPORT</b> 🚨\n\n" .
-                "🆔 <b>Req ID:</b> <code>$requestId</code>\n" .
-                "👤 <b>User:</b> $userInfo\n" .
-                "🌐 <b>IP:</b> {$request->ip()}\n" .
-                "🔗 <b>Method:</b> {$request->method()} {$request->fullUrl()}\n" .
-                "🔢 <b>Code:</b> $code\n" .
-                "----------------------------\n" .
-                "💬 <b>Message:</b> $message\n" .
-                "💥 <b>Exception:</b> $errorDetail" .
-                $fileInfo;
-
-            $token = config('services.telegram.bot_token');
-            $chatId = config('services.telegram.chat_id');
-
-            if ($token && $chatId) {
-                Http::timeout(3)->post("https://api.telegram.org/bot$token/sendMessage", [
-                    'chat_id' => $chatId,
-                    'text' => substr($text, 0, 4090),
-                    'parse_mode' => 'HTML',
-                    'disable_web_page_preview' => true
-                ]);
-            }
-        } catch (Throwable $e) {
-            Log::error("Failed to report to Telegram: " . $e->getMessage());
-        }
-
-        return $requestId;
     }
 }
