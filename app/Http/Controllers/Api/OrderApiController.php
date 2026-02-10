@@ -35,7 +35,7 @@ class OrderApiController extends Controller
                     'order_info' => $request->order_info,
                     'total_price' => $request->total_price,
                     'source' => $request->source,
-                    'status' => 'pending', // Default status
+                    'status' => 'pending',
                 ]);
 
                 foreach ($request->items as $item) {

@@ -22,14 +22,11 @@ class MenuController extends Controller
 
         $product = Product::where('restaurant_id', $restaurant->id)->findOrFail($productId);
 
-        // Generate an absolute URL for the image, as required by Open Graph
         $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
 
-        // Get the base URL for the React app from environment variables
-        // e.g., REACT_APP_BASE_URL=ezmenu.com
-        $reactAppBaseUrl = config('app.frontend_url_base', 'ngopikode.my.id');
+        // Menggunakan frontend_url_base dari config
+        $reactAppBaseUrl = config('app.frontend_url_base');
 
-        // Construct the new URL format: subdomain.react_app_base_url
         $protocol = request()->isSecure() ? 'https' : 'http';
         $fullReactUrl = "{$protocol}://{$restaurant->subdomain}.{$reactAppBaseUrl}";
 

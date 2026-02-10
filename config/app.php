@@ -188,6 +188,8 @@ return [
     ])->toArray(),
 
     'landing_domain' => env('APP_LANDING_DOMAIN', 'localhost'),
-    'domain' => env('APP_DOMAIN', 'localhost')
+    'domain' => env('APP_DOMAIN', 'localhost'),
+
+    'frontend_url_base' => env('APP_FRONTEND_URL_BASE', 'ngopikode.my.id')
 
 ];
