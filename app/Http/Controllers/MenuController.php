@@ -22,7 +22,7 @@ class MenuController extends Controller
 
         $product = Product::where('restaurant_id', $restaurant->id)->findOrFail($productId);
 
-        $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
+        $imageUrl = $product->image ? (config('app.url') . Storage::url($product->image)) : null;
 
         // Menggunakan frontend_url_base dari config
         $reactAppBaseUrl = config('app.frontend_url_base');
