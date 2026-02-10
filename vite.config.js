@@ -7,10 +7,6 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
-                'resources/css/invite.css',
-                'resources/js/invite.js',
-                'resources/views/themes/elegant-theme/wedding/gold-wedding/assets/css/app.css',
-                'resources/views/themes/elegant-theme/wedding/gold-wedding/assets/js/app.js'
             ],
             refresh: true
         })
