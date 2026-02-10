@@ -31,7 +31,7 @@ class MenuController extends Controller
 
         // Construct the new URL format: subdomain.react_app_base_url
         $protocol = request()->isSecure() ? 'https' : 'http';
-        $fullReactUrl = "{$protocol}://{$restaurant->subdomain}.{$reactAppBaseUrl}";
+        $fullReactUrl = "{$protocol}://{$restaurant->subdomain}.{$reactAppBaseUrl}/menu";
 
         return view('product_preview', [
             'restaurant' => $restaurant,
