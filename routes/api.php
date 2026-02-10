@@ -21,4 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/client/{subdomain}', ClientApiController::class);
-Route::post('/orders', [OrderApiController::class, 'store']);
+Route::post('/orders/{subdomain}', [OrderApiController::class, 'store']);

@@ -3,46 +3,33 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Http\Requests\OrderApiRequest;
+use App\Models\Restaurant;
+use App\Traits\ApiResponserTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class OrderApiController extends Controller
 {
+    use ApiResponserTrait;
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     * @return JsonResponse
+     * @param \App\Http\Requests\OrderApiRequest $request
+     * @param string $subdomain
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(OrderApiRequest $request, string $subdomain): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'restaurant_id' => 'required|exists:restaurants,id',
-            'customer_name' => 'required|string|max:255',
-            'order_type' => 'required|in:dinein,takeaway,delivery',
-            'order_info' => 'nullable|string',
-            'total_price' => 'required|numeric|min:0',
-            'source' => 'required|in:whatsapp,in-app',
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.name' => 'required|string|max:255',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->failResponse($validator->errors());
-        }
+        // The authorization logic is now handled by the OrderApiRequest.
+        // We can safely retrieve the restaurant.
+        $restaurant = Restaurant::where('subdomain', $subdomain)->firstOrFail();
 
         try {
-            $order = DB::transaction(function () use ($request) {
-                $order = Order::create([
-                    'restaurant_id' => $request->restaurant_id,
+            $order = DB::transaction(function () use ($request, $restaurant) {
+                $order = $restaurant->orders()->create([
                     'customer_name' => $request->customer_name,
                     'order_type' => $request->order_type,
                     'order_info' => $request->order_info,
