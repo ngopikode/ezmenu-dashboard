@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Restaurant;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
@@ -22,7 +23,7 @@ class MenuController extends Controller
         $product = Product::where('restaurant_id', $restaurant->id)->findOrFail($productId);
 
         // Generate an absolute URL for the image, as required by Open Graph
-        $imageUrl = asset($product->image);
+        $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
 
         // Get the base URL for the React app from environment variables
         // e.g., REACT_APP_BASE_URL=ezmenu.com
@@ -30,7 +31,7 @@ class MenuController extends Controller
 
         // Construct the new URL format: subdomain.react_app_base_url
         $protocol = request()->isSecure() ? 'https' : 'http';
-        $fullReactUrl = "$protocol://$restaurant->subdomain.$reactAppBaseUrl";
+        $fullReactUrl = "{$protocol}://{$restaurant->subdomain}.{$reactAppBaseUrl}";
 
         return view('product_preview', [
             'restaurant' => $restaurant,

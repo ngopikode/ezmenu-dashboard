@@ -38,8 +38,8 @@ class ClientApiController extends Controller
                 'price' => (float) $product->price,
                 'description' => $product->description,
                 'category' => $product->category->name,
-                // Menggunakan Storage::url() untuk mendapatkan URL yang benar
-                'image' => $product->image ? Storage::url($product->image) : null,
+                // Menggunakan asset() untuk menghasilkan URL absolut
+                'image' => $product->image ? asset(Storage::url($product->image)) : null,
                 'type' => $product->type,
                 'options' => $product->options->pluck('name'),
             ];
@@ -49,8 +49,8 @@ class ClientApiController extends Controller
             'restaurant' => [
                 'id' => $restaurant->id,
                 'name' => $restaurant->name,
-                // Menggunakan Storage::url() untuk mendapatkan URL yang benar
-                'logo' => $restaurant->logo ? Storage::url($restaurant->logo) : null,
+                // Menggunakan asset() untuk menghasilkan URL absolut
+                'logo' => $restaurant->logo ? asset(Storage::url($restaurant->logo)) : null,
                 'theme_color' => $restaurant->theme_color,
                 'whatsapp_number' => $restaurant->whatsapp_number,
                 'address' => $restaurant->address,
@@ -60,8 +60,8 @@ class ClientApiController extends Controller
                     'keywords' => $restaurant->seo_keywords,
                     'og_title' => $restaurant->og_title,
                     'og_description' => $restaurant->og_description,
-                    // Menggunakan Storage::url() untuk mendapatkan URL yang benar
-                    'og_image' => $restaurant->og_image ? Storage::url($restaurant->og_image) : null,
+                    // Menggunakan asset() untuk menghasilkan URL absolut
+                    'og_image' => $restaurant->og_image ? asset(Storage::url($restaurant->og_image)) : null,
                 ]
             ],
             'products' => $formattedProducts,
