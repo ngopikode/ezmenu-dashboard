@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
-use App\Models\Option;
-use App\Models\Product;
-use App\Models\Restaurant;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\Restaurant;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Option;
 
 class DatabaseSeeder extends Seeder
 {
@@ -34,16 +34,24 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'), // Ganti dengan password yang aman nanti
         ]);
 
-        // 3. Buat Restoran (Tenant)
+        // 3. Buat Restoran (Tenant) dengan data SEO yang diperbarui
         $restaurant = Restaurant::create([
             'user_id' => $user->id,
             'name' => 'Sama Roti Kukus',
             'subdomain' => 'samarotikukus',
-            'logo' => '/assets/img/logo.png', // Sesuaikan path jika perlu
+            'logo' => '/logo.png',
             'theme_color' => '#d4b982',
             'whatsapp_number' => '6282283668001',
             'address' => "Kompleks @allnewtsjcafe, Bangkot Kab Kampar",
             'is_active' => true,
+
+            // --- Data SEO dan OG yang disesuaikan ---
+            'seo_title' => 'Sama Roti Kukus - Seruput & Gigit | Kuliner Hits Kampar',
+            'seo_description' => 'Nikmati sensasi roti kukus lumer dan minuman kekinian paling hits di Kampar sejak 2019. Lokasi: Kompleks @allnewtsjcafe. Pesan online sekarang!',
+            'seo_keywords' => 'Sama Roti Kukus, Rokus Kampar, Kuliner Kampar, Roti Kukus Lumer, Jajanan Kampar',
+            'og_title' => 'Sama Roti Kukus - Seruput & Gigit',
+            'og_description' => 'Camilan lumer paling hits di Kampar. Harga mulai 7k! Beli 4 Gratis 1.',
+            'og_image' => '/assets/img/rokus-ori.png', // Gambar OG disesuaikan
         ]);
 
         // 4. Buat Kategori untuk restoran ini
@@ -59,7 +67,7 @@ class DatabaseSeeder extends Seeder
             'order_column' => 2,
         ]);
 
-        // 5. Data Menu Lengkap
+        // 5. Data Menu Lengkap (tidak berubah)
         $menuData = [
             [
                 'id' => 1, 'cat' => 'roti', 'name' => 'Rokus Original', 'price' => 7000, 'desc' => 'Pilih 1 varian rasa klasik favoritmu.',
@@ -78,35 +86,35 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'id' => 4, 'cat' => 'minuman', 'name' => 'Kopi Susu Aren', 'price' => 11000, 'desc' => 'Signature coffee dengan gula aren asli.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/kopi-susu-aren.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/kopi-susu-aren.jpeg'
             ],
             [
                 'id' => 5, 'cat' => 'minuman', 'name' => 'Blue Ocean', 'price' => 11000, 'desc' => 'Kesegaran soda biru lemon yang unik.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/blue-ocean.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/blue-ocean.jpeg'
             ],
             [
                 'id' => 6, 'cat' => 'minuman', 'name' => 'Milky Mango', 'price' => 11000, 'desc' => 'Creamy milk dengan rasa mangga manis.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/milky-mango.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/milky-mango.jpeg'
             ],
             [
                 'id' => 7, 'cat' => 'minuman', 'name' => 'Passion Soda', 'price' => 11000, 'desc' => 'Soda markisa yang menyegarkan dahaga.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/passion-soda.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/passion-soda.jpeg'
             ],
             [
                 'id' => 8, 'cat' => 'minuman', 'name' => 'Choco Milky', 'price' => 11000, 'desc' => 'Susu cokelat creamy yang nyoklat banget.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/choco-milky.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/choco-milky.jpeg'
             ],
             [
                 'id' => 9, 'cat' => 'minuman', 'name' => 'Yakult Mango', 'price' => 11000, 'desc' => 'Perpaduan Yakult dan mangga yang segar.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/yakult-mango.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/yakult-mango.jpeg'
             ],
             [
                 'id' => 10, 'cat' => 'minuman', 'name' => 'Yakult Peach', 'price' => 11000, 'desc' => 'Kesegaran Yakult dengan aroma peach.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/yakult-peach.jpeg'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/yakult-peach.jpeg'
             ],
             [
                 'id' => 11, 'cat' => 'minuman', 'name' => 'Cendol Aren', 'price' => 10000, 'desc' => 'Cita rasa tradisional cendol gula aren.',
-                'type' => 'single', 'options' => [], 'img' => '/assets/img/cendol-aren.png'
+                'type' => 'drink', 'options' => [], 'img' => '/assets/img/cendol-aren.png'
             ]
         ];
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MenuController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+// Route for generating rich social media previews for products
+Route::get('/{subdomain}/menu/{productId}', [MenuController::class, 'showProductPreview'])
+    ->where('productId', '[0-9]+'); // Ensure productId is a number
 
 Route::middleware(['auth'])->group(function () {
 

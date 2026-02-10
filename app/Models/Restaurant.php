@@ -20,6 +20,13 @@ class Restaurant extends Model
         'whatsapp_number',
         'address',
         'is_active',
+        // SEO Fields
+        'seo_title',
+        'seo_description',
+        'seo_keywords',
+        'og_title',
+        'og_description',
+        'og_image',
     ];
 
     public function user(): BelongsTo
