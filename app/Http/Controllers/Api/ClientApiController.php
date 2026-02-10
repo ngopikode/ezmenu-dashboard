@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class ClientApiController extends Controller
 {
@@ -36,29 +37,31 @@ class ClientApiController extends Controller
                 'name' => $product->name,
                 'price' => (float) $product->price,
                 'description' => $product->description,
-                'category' => $product->category->name, // Get category name
-                'image' => asset($product->image), // Use asset() to generate full URL
+                'category' => $product->category->name,
+                // Menggunakan Storage::url() untuk mendapatkan URL yang benar
+                'image' => $product->image ? Storage::url($product->image) : null,
                 'type' => $product->type,
-                'options' => $product->options->pluck('name'), // Get just the names of the options
+                'options' => $product->options->pluck('name'),
             ];
         });
 
         $data = [
             'restaurant' => [
-                'id' => $restaurant->id, // ID restoran ditambahkan
+                'id' => $restaurant->id,
                 'name' => $restaurant->name,
-                'logo' => asset($restaurant->logo),
+                // Menggunakan Storage::url() untuk mendapatkan URL yang benar
+                'logo' => $restaurant->logo ? Storage::url($restaurant->logo) : null,
                 'theme_color' => $restaurant->theme_color,
                 'whatsapp_number' => $restaurant->whatsapp_number,
                 'address' => $restaurant->address,
-                // Objek SEO baru
                 'seo' => [
                     'title' => $restaurant->seo_title,
                     'description' => $restaurant->seo_description,
                     'keywords' => $restaurant->seo_keywords,
                     'og_title' => $restaurant->og_title,
                     'og_description' => $restaurant->og_description,
-                    'og_image' => asset($restaurant->og_image),
+                    // Menggunakan Storage::url() untuk mendapatkan URL yang benar
+                    'og_image' => $restaurant->og_image ? Storage::url($restaurant->og_image) : null,
                 ]
             ],
             'products' => $formattedProducts,
