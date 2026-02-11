@@ -20,7 +20,7 @@ new class extends Component {
         <div class="d-flex flex-column align-items-center">
             <span class="font-script text-brand"
                   style="font-size: 2.2rem; line-height: 1;">{{ config('app.name') }}</span>
-            <small class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 2px;">INVITATION
+            <small class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 2px;">RESTAURANT
                 DASHBOARD</small>
         </div>
     </div>
@@ -34,16 +34,15 @@ $menuSections = [
         'title' => 'Menu Utama',
         'items' => [
             ['route' => 'dashboard', 'icon' => 'bi bi-grid-fill', 'label' => 'Dashboard'],
-            ['route' => 'invitation', 'icon' => 'bi bi-envelope-heart-fill', 'label' => 'Data Undangan'],
-            ['route' => 'guests', 'icon' => 'bi bi-people-fill', 'label' => 'Tamu & RSVP'],
-            ['route' => 'wishes', 'icon' => 'bi bi-chat-quote-fill', 'label' => 'Ucapan & Doa'],
-            ['route' => 'theme', 'icon' => 'bi bi-music-note-beamed', 'label' => 'Tema & Musik'],
+            ['route' => 'menu.index', 'icon' => 'bi bi-journal-richtext', 'label' => 'Menu Restoran'],
+            ['route' => 'orders.index', 'icon' => 'bi bi-receipt-cutoff', 'label' => 'Pesanan Masuk'],
         ]
     ],
     [
         'title' => 'Pengaturan',
         'items' => [
-            ['route' => 'profile', 'icon' => 'bi bi-person-gear', 'label' => 'Profil Saya'],
+            ['route' => 'settings.index', 'icon' => 'bi bi-shop', 'label' => 'Pengaturan Resto'],
+            ['route' => 'profile', 'icon' => 'bi bi-person-gear', 'label' => 'Profil Akun'],
         ]
     ]
 ];

@@ -25,12 +25,20 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))->group(function 
 
 // --- Rute untuk Dashboard Admin ---
 // Ini akan menangani domain utama: restaurant.ngopikode.com
-Route::middleware(['auth'])->group(function () {
-
     Route::middleware(['verified'])->group(function () {
         Route::view('/', 'dashboard')->name('dashboard');
+        
+        // Menu Management
+        Route::get('/menu', \App\Livewire\Menu\Index::class)->name('menu.index');
+        
+        // Order Management
+        Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
+        
+        // Settings
+        Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
+        
+        // Profile
+        Route::view('profile', 'profile')->name('profile');
     });
-    Route::view('profile', 'profile')->name('profile');
-});
 
 require __DIR__ . '/auth.php';

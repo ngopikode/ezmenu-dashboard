@@ -27,7 +27,7 @@ new class extends Component {
             </button>
 
             <h5 class="m-0 font-serif fw-bold d-none d-md-block text-truncate" style="max-width: 300px;">
-                {{ $header ?? 'Dashboard Overview' }}
+                {{ $header ?? 'Restaurant Management' }}
             </h5>
         </div>
 
