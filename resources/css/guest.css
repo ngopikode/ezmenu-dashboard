@@ -105,3 +105,18 @@ body {
     border-color: #cbd5e1;
     color: #0f172a;
 }
+
+/* NProgress */
+#nprogress .bar {
+    background: var(--brand-color) !important;
+    height: 3px !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px var(--brand-color), 0 0 5px var(--brand-color) !important;
+}
+
+#nprogress .spinner-icon {
+    border-top-color: var(--brand-color) !important;
+    border-left-color: var(--brand-color) !important;
+}
