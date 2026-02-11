@@ -19,7 +19,22 @@
 </head>
 <body>
 <div id="wrapper">
-    <livewire:layout.sidebar/>
+
+    <!-- Desktop Sidebar (Hidden on Mobile) -->
+    <div class="d-none d-md-flex">
+        <livewire:layout.sidebar elementId="sidebar-wrapper"/>
+    </div>
+
+    <!-- Mobile Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel" style="width: 280px;">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title font-serif fw-bold" id="mobileSidebarLabel">{{ config('app.name') }}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <livewire:layout.sidebar elementId="mobile-sidebar-wrapper"/>
+        </div>
+    </div>
 
     <div id="page-content-wrapper">
         <livewire:layout.navigation :header="$header ?? null"/>

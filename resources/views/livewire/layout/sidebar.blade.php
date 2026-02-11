@@ -4,6 +4,8 @@ use App\Livewire\Actions\Logout;
 use Livewire\Volt\Component;
 
 new class extends Component {
+    public string $elementId = 'sidebar-wrapper';
+
     /**
      * Log the current user out of the application.
      */
@@ -14,7 +16,7 @@ new class extends Component {
     }
 }; ?>
 
-<aside id="sidebar-wrapper">
+<aside id="{{ $elementId }}">
 
     <div class="sidebar-heading text-center py-4">
         <div class="d-flex flex-column align-items-center">

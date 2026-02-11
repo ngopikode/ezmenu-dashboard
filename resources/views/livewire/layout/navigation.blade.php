@@ -22,7 +22,13 @@ new class extends Component {
     <div class="d-flex align-items-center justify-content-between w-100 flex-nowrap">
 
         <div class="d-flex align-items-center gap-2 gap-lg-3">
-            <button class="btn text-primary border-0 p-2" id="sidebarToggle">
+            <!-- Mobile Toggle (Offcanvas) -->
+            <button class="btn text-primary border-0 p-2 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+
+            <!-- Desktop Toggle -->
+            <button class="btn text-primary border-0 p-2 d-none d-md-block" id="sidebarToggle">
                 <i class="bi bi-list fs-4"></i>
             </button>
 
@@ -95,30 +101,22 @@ new class extends Component {
 
 @push('custom-scripts')
     <script>
-        sidebarToggle.onclick = function (e) {
-            e.preventDefault();
-            document.body.classList.toggle('sb-sidenav-toggled');
-            localStorage.setItem(
-                'sb|sidebar-toggle',
-                document.body.classList.contains('sb-sidenav-toggled').toString()
-            );
-        };
-
-        document.addEventListener('click', function (e) {
-            const toggle = document.getElementById('sidebarToggle');
-            if (toggle.contains(e.target)) return;
-
-            const sidebar = document.getElementById('sidebar-wrapper');
-
-            // Hanya jalan di mobile & sidebar terbuka
-            if (!sidebar) return;
-            if (!document.body.classList.contains('sb-sidenav-toggled')) return;
-            if (window.innerWidth >= 768) return; // desktop skip
-
-            // Kalau klik di luar sidebar
-            if (!sidebar.contains(e.target)) {
-                document.body.classList.remove('sb-sidenav-toggled');
+        // Desktop sidebar toggle logic
+        function initDesktopSidebarToggle() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.onclick = function (e) {
+                    e.preventDefault();
+                    document.body.classList.toggle('sb-sidenav-toggled');
+                    localStorage.setItem(
+                        'sb|sidebar-toggle',
+                        document.body.classList.contains('sb-sidenav-toggled').toString()
+                    );
+                };
             }
-        });
+        }
+
+        document.addEventListener('DOMContentLoaded', initDesktopSidebarToggle);
+        document.addEventListener('livewire:navigated', initDesktopSidebarToggle);
     </script>
 @endpush

@@ -99,36 +99,12 @@ body {
     transition: margin 0.3s ease-in-out;
 }
 
-/* Sidebar Toggle Logic */
+/* Sidebar Toggle Logic (Desktop Only) */
 body.sb-sidenav-toggled #sidebar-wrapper {
     margin-left: -280px;
 }
 
-@media (max-width: 768px) {
-    #sidebar-wrapper {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        width: 280px;
-        background-color: var(--niema-bg-sidebar);
-        z-index: 1050;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-    }
-
-    body.sb-sidenav-toggled::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 1045;
-    }
-
-    body.sb-sidenav-toggled #sidebar-wrapper {
-        transform: translateX(0);
-    }
-}
+/* Mobile styles handled by Offcanvas now */
 
 .list-group-item-action {
     color: var(--niema-text-muted);
@@ -274,4 +250,14 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 [data-bs-theme="dark"] .bg-white {
     background-color: var(--niema-bg-card) !important;
     color: var(--niema-text-main) !important;
+}
+
+/* Offcanvas Dark Mode Fix */
+[data-bs-theme="dark"] .offcanvas {
+    background-color: var(--niema-bg-sidebar);
+    color: var(--niema-text-main);
+}
+
+[data-bs-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
 }
