@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Helpers\TelegramHelper;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -42,6 +43,13 @@ class Handler extends ExceptionHandler
         $this->renderable(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {
                 return $this->handleApiException($e, $request);
+            }
+
+            if (method_exists($e, 'getStatusCode') && $e->getStatusCode() >= 500) {
+                TelegramHelper::reportToTelegram(
+                    errors: $e,
+                    request: $request
+                );
             }
         });
     }

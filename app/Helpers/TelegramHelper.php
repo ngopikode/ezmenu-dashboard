@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Random\RandomException;
 use Throwable;
 
 /**
@@ -24,6 +25,7 @@ class TelegramHelper
      * @param string $message Custom error message context.
      * @param int $code HTTP Status code or Error code.
      * @return string The generated Request ID.
+     * @throws RandomException
      */
     public static function reportToTelegram(
         mixed   $errors,
