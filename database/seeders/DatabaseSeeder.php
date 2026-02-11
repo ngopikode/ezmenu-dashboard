@@ -45,6 +45,20 @@ class DatabaseSeeder extends Seeder
             'whatsapp_number' => '6282283668001',
             'address' => "Kompleks @allnewtsjcafe, Bangkot Kab Kampar",
             'is_active' => true,
+
+            // Hero Section
+            'hero_promo_text' => 'Promo',
+            'hero_status_text' => 'Open until 11.00PM',
+            'hero_headline' => 'Seruput & Gigit',
+            'hero_tagline' => '"StayTune the Healthy People"',
+            'hero_instagram_url' => '#',
+
+            // Navbar
+            'navbar_brand_text' => 'Sama',
+            'navbar_title' => 'Roti Kukus',
+            'navbar_subtitle' => "Kampar • Est. 10'19th",
+
+            // SEO
             'seo_title' => 'Sama Roti Kukus - Seruput & Gigit | Kuliner Hits Kampar',
             'seo_description' => 'Nikmati sensasi roti kukus lumer dan minuman kekinian paling hits di Kampar sejak 2019. Lokasi: Kompleks @allnewtsjcafe. Pesan online sekarang!',
             'seo_keywords' => 'Sama Roti Kukus, Rokus Kampar, Kuliner Kampar, Roti Kukus Lumer, Jajanan Kampar',

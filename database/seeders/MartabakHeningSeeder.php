@@ -38,6 +38,20 @@ class MartabakHeningSeeder extends Seeder
             'whatsapp_number' => '6285172441544', // Nomor kamu (format 62)
             'address' => "Jl. Kemenangan No. 88, (Depan Indomaret Point)",
             'is_active' => true,
+
+            // Hero Section
+            'hero_promo_text' => 'Promo Spesial',
+            'hero_status_text' => 'Buka 17.00 - 23.00',
+            'hero_headline' => 'Manis & Gurih',
+            'hero_tagline' => 'Nikmati kelembutan di setiap gigitan.',
+            'hero_instagram_url' => '#',
+
+            // Navbar
+            'navbar_brand_text' => 'Martabak',
+            'navbar_title' => 'Hening',
+            'navbar_subtitle' => 'Sejak 2020',
+
+            // SEO
             'seo_title' => 'Martabak Hening - Manis & Telur Premium',
             'seo_description' => 'Martabak manis dengan topping melimpah dan martabak telur renyah. Bahan premium, rasa juara.',
             'seo_keywords' => 'Martabak Hening, Martabak Manis, Terang Bulan, Martabak Telur, Kuliner Malam',

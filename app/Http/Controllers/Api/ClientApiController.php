@@ -52,6 +52,18 @@ class ClientApiController extends Controller
                 'theme_color' => $restaurant->theme_color,
                 'whatsapp_number' => $restaurant->whatsapp_number,
                 'address' => $restaurant->address,
+                'hero' => [
+                    'promo_text' => $restaurant->hero_promo_text,
+                    'status_text' => $restaurant->hero_status_text,
+                    'headline' => $restaurant->hero_headline,
+                    'tagline' => $restaurant->hero_tagline,
+                    'instagram_url' => $restaurant->hero_instagram_url,
+                ],
+                'navbar' => [
+                    'brand_text' => $restaurant->navbar_brand_text,
+                    'title' => $restaurant->navbar_title,
+                    'subtitle' => $restaurant->navbar_subtitle,
+                ],
                 'seo' => [
                     'title' => $restaurant->seo_title,
                     'description' => $restaurant->seo_description,

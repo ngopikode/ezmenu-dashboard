@@ -20,6 +20,16 @@ class Restaurant extends Model
         'whatsapp_number',
         'address',
         'is_active',
+        // Hero Section
+        'hero_promo_text',
+        'hero_status_text',
+        'hero_headline',
+        'hero_tagline',
+        'hero_instagram_url',
+        // Navbar
+        'navbar_brand_text',
+        'navbar_title',
+        'navbar_subtitle',
         // SEO Fields
         'seo_title',
         'seo_description',
