@@ -3,46 +3,59 @@
 namespace App\Livewire\Menu;
 
 use App\Models\Category;
+use App\Models\Option;
 use App\Models\Product;
+use App\Traits\CompressesImages;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class Index extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, CompressesImages;
 
     public $categories;
-    public $activeCategoryId = null; // For accordion or tabs
+    public $activeCategoryId = null;
 
     // Category Form
     public $showCategoryModal = false;
     public $isEditingCategory = false;
     public $categoryId;
+
+    #[Rule('required|string|max:255')]
     public $categoryName;
 
     // Product Form
     public $showProductModal = false;
     public $isEditingProduct = false;
     public $productId;
+
+    #[Rule('required|string|max:255')]
     public $productName;
+
     public $productDescription;
+
+    #[Rule('required|numeric|min:0')]
     public $productPrice;
+
+    #[Rule('nullable|image|max:2048')] // Increased max size since we compress
     public $productImage;
-    public $existingProductImage; // To show existing image
-    public $productCategoryId; // Helper for creating product in specific category
+
+    public $existingProductImage;
+
+    #[Rule('required|exists:categories,id')]
+    public $productCategoryId;
+
     public $productIsAvailable = true;
 
-    // Options Logic (Simplified for now - can be expanded)
-    public $productOptions = []; // Array of strings or objects
+    #[Rule('required|in:single,multi')]
+    public $productType = 'single';
 
-    protected $rules = [
-        'categoryName' => 'required|string|max:255',
-        'productName' => 'required|string|max:255',
-        'productPrice' => 'required|numeric|min:0',
-        'productCategoryId' => 'required|exists:categories,id',
-        'productImage' => 'nullable|image|max:1024', // 1MB Max
-    ];
+    #[Rule(['productOptions.*.name' => 'required|string|max:255'])]
+    public $productOptions = [];
 
     public function mount()
     {
@@ -54,7 +67,7 @@ class Index extends Component
         $user = Auth::user();
         $this->categories = Category::where('restaurant_id', $user->restaurant->id)
             ->with(['products' => function ($q) {
-                $q->orderBy('order_column');
+                $q->with('options')->orderBy('order_column');
             }])
             ->orderBy('order_column')
             ->get();
@@ -64,10 +77,24 @@ class Index extends Component
         }
     }
 
+    #[Layout('components.layouts.app')]
     public function render()
     {
         return view('livewire.menu.index');
     }
+
+    // --- Options Management ---
+    public function addOption()
+    {
+        $this->productOptions[] = ['name' => ''];
+    }
+
+    public function removeOption($index)
+    {
+        unset($this->productOptions[$index]);
+        $this->productOptions = array_values($this->productOptions);
+    }
+
 
     // --- Category Management ---
 
@@ -92,7 +119,7 @@ class Index extends Component
 
     public function saveCategory()
     {
-        $this->validate(['categoryName' => 'required|string|max:255']);
+        $this->validateOnly('categoryName');
 
         $user = Auth::user();
 
@@ -135,12 +162,14 @@ class Index extends Component
         $this->existingProductImage = null;
         $this->productCategoryId = $categoryId;
         $this->productIsAvailable = true;
+        $this->productType = 'single';
+        $this->productOptions = [];
         $this->showProductModal = true;
     }
 
     public function openEditProductModal($id)
     {
-        $product = Product::find($id);
+        $product = Product::with('options')->find($id);
         if ($product) {
             $this->isEditingProduct = true;
             $this->productId = $id;
@@ -150,24 +179,25 @@ class Index extends Component
             $this->existingProductImage = $product->image;
             $this->productCategoryId = $product->category_id;
             $this->productIsAvailable = $product->is_available;
+            $this->productType = $product->type;
+            $this->productOptions = $product->options->toArray();
             $this->showProductModal = true;
         }
     }
 
     public function saveProduct()
     {
-        $this->validate([
-            'productName' => 'required|string|max:255',
-            'productPrice' => 'required|numeric|min:0',
-            'productCategoryId' => 'required|exists:categories,id',
-            'productImage' => 'nullable|image|max:1024',
-        ]);
+        $this->validate();
 
         $user = Auth::user();
         $imagePath = $this->existingProductImage;
 
         if ($this->productImage) {
-            $imagePath = $this->productImage->store('products', 'public');
+            if ($this->existingProductImage) {
+                Storage::disk('public')->delete($this->existingProductImage);
+            }
+            // Use the trait to compress and store
+            $imagePath = $this->compressAndStore($this->productImage, 'products/' . $user->restaurant->id);
         }
 
         $data = [
@@ -177,6 +207,7 @@ class Index extends Component
             'category_id' => $this->productCategoryId,
             'image' => $imagePath,
             'is_available' => $this->productIsAvailable,
+            'type' => $this->productType,
         ];
 
         if ($this->isEditingProduct) {
@@ -184,9 +215,16 @@ class Index extends Component
             $product->update($data);
         } else {
             $data['restaurant_id'] = $user->restaurant->id;
-            // Calculate order
             $data['order_column'] = Product::where('category_id', $this->productCategoryId)->max('order_column') + 1;
-            Product::create($data);
+            $product = Product::create($data);
+        }
+
+        // Handle Options
+        $product->options()->delete();
+        if (!empty($this->productOptions)) {
+            foreach ($this->productOptions as $option) {
+                $product->options()->create(['name' => $option['name']]);
+            }
         }
 
         $this->showProductModal = false;
@@ -208,6 +246,9 @@ class Index extends Component
     {
         $product = Product::find($id);
         if ($product) {
+            if ($product->image) {
+                Storage::disk('public')->delete($product->image);
+            }
             $product->delete();
             $this->refreshData();
         }

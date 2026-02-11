@@ -34,9 +34,7 @@ new class extends Component {
         <ul class="navbar-nav ms-auto flex-row align-items-center gap-2 gap-lg-3">
 
             <li class="nav-item">
-                <button class="btn btn-link nav-link text-secondary p-2" id="themeToggle" title="Ganti Tema">
-                    <i class="bi bi-moon-stars fs-5" id="themeIcon"></i>
-                </button>
+                <livewire:theme-toggle />
             </li>
 
             <li class="nav-item">
@@ -121,48 +119,6 @@ new class extends Component {
             if (!sidebar.contains(e.target)) {
                 document.body.classList.remove('sb-sidenav-toggled');
             }
-        });
-    </script>
-
-    <script>
-        function initThemeToggle() {
-            const toggleButton = document.getElementById('themeToggle');
-            const themeIcon = document.getElementById('themeIcon');
-            const htmlElement = document.documentElement;
-
-            if (!toggleButton) return;
-
-            const setTheme = (theme) => {
-                htmlElement.setAttribute('data-bs-theme', theme);
-                localStorage.setItem('theme', theme);
-                if (theme === 'dark') {
-                    themeIcon.classList.replace('bi-moon-stars', 'bi-sun-fill');
-                    themeIcon.classList.add('text-warning');
-                } else {
-                    themeIcon.classList.replace('bi-sun-fill', 'bi-moon-stars');
-                    themeIcon.classList.remove('text-warning');
-                }
-            };
-
-            const storedTheme = localStorage.getItem('theme');
-            const now = new Date();
-            const hours = now.getHours();
-            const timeBasedTheme = (hours >= 18 || hours < 6) ? 'dark' : 'light';
-            setTheme(storedTheme || timeBasedTheme);
-
-            toggleButton.onclick = function (e) {
-                e.preventDefault();
-                const currentTheme = htmlElement.getAttribute('data-bs-theme');
-                setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-            };
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initThemeToggle();
-        });
-
-        document.addEventListener('livewire:navigated', () => {
-            initThemeToggle();
         });
     </script>
 @endpush

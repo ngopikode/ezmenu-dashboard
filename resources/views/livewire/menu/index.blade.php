@@ -4,7 +4,7 @@
             <h2 class="fw-bold font-serif text-dark mb-1">Daftar Menu</h2>
             <p class="text-muted small mb-0">Kelola kategori dan produk menu restoran anda.</p>
         </div>
-        
+
         <button wire:click="openCreateCategoryModal" class="btn btn-brand rounded-pill px-4 shadow-sm">
             <i class="bi bi-folder-plus me-2"></i> Tambah Kategori
         </button>
@@ -26,21 +26,21 @@
                     @foreach($categories as $category)
                         <div class="accordion-item border-0 shadow-sm rounded-4 mb-3 overflow-hidden">
                             <h2 class="accordion-header" id="heading{{ $category->id }}">
-                                <button class="accordion-button {{ $activeCategoryId == $category->id ? '' : 'collapsed' }} bg-white px-4 py-3 fw-bold text-dark shadow-none" 
-                                        type="button" 
-                                        data-bs-toggle="collapse" 
-                                        data-bs-target="#collapse{{ $category->id }}" 
-                                        aria-expanded="{{ $activeCategoryId == $category->id ? 'true' : 'false' }}" 
+                                <button class="accordion-button {{ $activeCategoryId == $category->id ? '' : 'collapsed' }} bg-white px-4 py-3 fw-bold text-dark shadow-none"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#collapse{{ $category->id }}"
+                                        aria-expanded="{{ $activeCategoryId == $category->id ? 'true' : 'false' }}"
                                         aria-controls="collapse{{ $category->id }}">
                                     <span class="me-auto">{{ $category->name }} <span class="badge bg-light text-muted ms-2 rounded-pill">{{ $category->products->count() }} Item</span></span>
                                 </button>
                             </h2>
-                            <div id="collapse{{ $category->id }}" 
-                                 class="accordion-collapse collapse {{ $activeCategoryId == $category->id ? 'show' : '' }}" 
-                                 aria-labelledby="heading{{ $category->id }}" 
+                            <div id="collapse{{ $category->id }}"
+                                 class="accordion-collapse collapse {{ $activeCategoryId == $category->id ? 'show' : '' }}"
+                                 aria-labelledby="heading{{ $category->id }}"
                                  data-bs-parent="#menuAccordion">
                                 <div class="accordion-body bg-light p-4">
-                                    
+
                                     <!-- Category Actions -->
                                     <div class="d-flex justify-content-between align-items-center mb-4">
                                         <div class="btn-group">
@@ -48,7 +48,7 @@
                                                 <i class="bi bi-pencil me-1"></i> Edit Kategori
                                             </button>
                                             @if($category->products->count() == 0)
-                                            <button wire:click="deleteCategory({{ $category->id }})" 
+                                            <button wire:click="deleteCategory({{ $category->id }})"
                                                     wire:confirm="Yakin ingin menghapus kategori ini?"
                                                     class="btn btn-sm btn-outline-danger rounded-pill px-3">
                                                 <i class="bi bi-trash me-1"></i> Hapus
@@ -75,7 +75,7 @@
                                                             </div>
                                                         @endif
                                                     </div>
-                                                    
+
                                                     <!-- Status Badge -->
                                                     <div class="position-absolute top-0 end-0 p-2">
                                                         <span class="badge {{ $product->is_available ? 'bg-success' : 'bg-secondary' }} rounded-pill shadow-sm">
@@ -86,7 +86,8 @@
                                                     <div class="card-body p-3 d-flex flex-column">
                                                         <h6 class="fw-bold text-dark mb-1 text-truncate">{{ $product->name }}</h6>
                                                         <p class="text-brand fw-bold mb-2">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-                                                        
+                                                        <p class="small text-muted mb-2">{{ $product->type }}</p>
+
                                                         <div class="mt-auto d-flex gap-2">
                                                             <button wire:click="openEditProductModal({{ $product->id }})" class="btn btn-sm btn-light flex-grow-1 rounded-pill border">
                                                                 Edit
@@ -94,7 +95,7 @@
                                                             <button wire:click="toggleAvailability({{ $product->id }})" class="btn btn-sm btn-light rounded-circle border" title="Toggle Status">
                                                                 <i class="bi {{ $product->is_available ? 'bi-toggle-on text-success' : 'bi-toggle-off text-muted' }} fs-5"></i>
                                                             </button>
-                                                            <button wire:click="deleteProduct({{ $product->id }})" 
+                                                            <button wire:click="deleteProduct({{ $product->id }})"
                                                                     wire:confirm="Hapus produk ini?"
                                                                     class="btn btn-sm btn-light rounded-circle border text-danger" title="Hapus">
                                                                 <i class="bi bi-trash"></i>
@@ -109,7 +110,7 @@
                                             </div>
                                         @endforelse
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -132,7 +133,7 @@
                     <form wire:submit.prevent="saveCategory">
                         <div class="mb-3">
                             <label class="form-label small text-muted fw-bold">Nama Kategori</label>
-                            <input type="text" class="form-control rounded-pill {{ $errors->has('categoryName') ? 'is-invalid' : '' }}" 
+                            <input type="text" class="form-control rounded-pill {{ $errors->has('categoryName') ? 'is-invalid' : '' }}"
                                    wire:model="categoryName" placeholder="Contoh: Makanan Utama">
                             @error('categoryName') <span class="invalid-feedback ps-2">{{ $message }}</span> @enderror
                         </div>
@@ -179,20 +180,20 @@
                                     @error('productImage') <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
-                            
+
                             <!-- Right: Details -->
                             <div class="col-md-8">
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold">Nama Produk</label>
-                                    <input type="text" class="form-control rounded-pill {{ $errors->has('productName') ? 'is-invalid' : '' }}" 
+                                    <input type="text" class="form-control rounded-pill {{ $errors->has('productName') ? 'is-invalid' : '' }}"
                                            wire:model="productName" placeholder="Contoh: Nasi Goreng Spesial">
                                     @error('productName') <span class="invalid-feedback ps-2">{{ $message }}</span> @enderror
                                 </div>
-                                
+
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
                                         <label class="form-label small text-muted fw-bold">Harga (Rp)</label>
-                                        <input type="number" class="form-control rounded-pill {{ $errors->has('productPrice') ? 'is-invalid' : '' }}" 
+                                        <input type="number" class="form-control rounded-pill {{ $errors->has('productPrice') ? 'is-invalid' : '' }}"
                                                wire:model="productPrice" placeholder="0">
                                         @error('productPrice') <span class="invalid-feedback ps-2">{{ $message }}</span> @enderror
                                     </div>
@@ -205,12 +206,38 @@
                                         </select>
                                     </div>
                                 </div>
-                                
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label small text-muted fw-bold">Tipe Produk</label>
+                                        <select class="form-select rounded-pill" wire:model="productType">
+                                            <option value="single">Single (Satu Pilihan)</option>
+                                            <option value="multi">Multi (Banyak Pilihan)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3">
                                     <label class="form-label small text-muted fw-bold">Deskripsi</label>
                                     <textarea class="form-control rounded-4" rows="3" wire:model="productDescription" placeholder="Jelaskan detail produk..."></textarea>
                                 </div>
-                                
+
+                                <!-- Options Section -->
+                                <div class="mb-3">
+                                    <label class="form-label small text-muted fw-bold">Varian / Opsi</label>
+                                    @foreach($productOptions as $index => $option)
+                                        <div class="input-group mb-2">
+                                            <input type="text" class="form-control rounded-start-pill" wire:model="productOptions.{{ $index }}.name" placeholder="Nama Varian">
+                                            <button class="btn btn-outline-danger rounded-end-pill" type="button" wire:click="removeOption({{ $index }})">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" wire:click="addOption">
+                                        <i class="bi bi-plus-lg me-1"></i> Tambah Varian
+                                    </button>
+                                </div>
+
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" role="switch" id="availabilitySwitch" wire:model="productIsAvailable">
                                     <label class="form-check-label" for="availabilitySwitch">Produk Tersedia</label>

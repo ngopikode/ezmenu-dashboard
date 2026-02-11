@@ -4,35 +4,32 @@
 
 /* --- 1. Definisi Variabel & Bootstrap Overrides --- */
 :root {
-    /* --- Niema Brand Colors --- */
-    --brand-color: #F50057;
-    --brand-dark: #C51162;
-    /* PENTING: Bootstrap butuh versi RGB untuk efek transparan/shadow */
-    --brand-rgb: 245, 0, 87;
+    /* --- Elegant, Earthy Brand Colors --- */
+    --brand-color: #A45D21; /* A warm, earthy brown/orange */
+    --brand-dark: #8C4E1A;  /* A slightly darker shade for hover */
+    --brand-rgb: 164, 93, 33;
 
     /* --- Fonts --- */
-    --font-sans: 'Poppins', sans-serif;
-    --font-serif: 'Playfair Display', serif;
-    --font-script: 'Great Vibes', cursive;
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Plus Jakarta Sans', sans-serif; /* Modern sans for headings */
 
-    /* --- Default Light Mode Variables --- */
-    --niema-bg-body: #fff0f5;
-    --niema-bg-sidebar: #ffffff;
-    --niema-bg-card: rgba(255, 255, 255, 0.95);
-    --niema-bg-navbar: rgba(255, 255, 255, 0.9);
+    /* --- Default Light Mode Variables (Soft & Elegant) --- */
+    --niema-bg-body: #FBFBFA;       /* Warm, very light off-white */
+    --niema-bg-sidebar: #FFFFFF;
+    --niema-bg-card: #FFFFFF;
+    --niema-bg-navbar: rgba(251, 251, 250, 0.85); /* Matches body bg with alpha */
 
-    --niema-text-main: #1e293b;
-    --niema-text-muted: #64748b;
+    --niema-text-main: #334155;     /* Slate 700 - Soft black */
+    --niema-text-muted: #64748B;    /* Slate 500 */
 
-    --niema-border-color: rgba(0, 0, 0, 0.05);
-    --niema-hover-bg: #fce4ec;
+    --niema-border-color: #F1F5F9;  /* Slate 100 - Very subtle */
+    --niema-hover-bg: rgba(164, 93, 33, 0.05); /* Faint brand color */
 
     /* =========================================
        BOOTSTRAP OVERRIDES (LIGHT MODE)
-       Ini mengubah komponen bawaan Bootstrap
     ========================================= */
     --bs-primary: var(--brand-color);
-    --bs-primary-rgb: var(--brand-rgb); /* Penting untuk focus ring & shadow */
+    --bs-primary-rgb: var(--brand-rgb);
 
     --bs-body-bg: var(--niema-bg-body);
     --bs-body-color: var(--niema-text-main);
@@ -44,40 +41,37 @@
     --bs-font-sans-serif: var(--font-sans);
 }
 
-/* --- 2. Dark Mode Overrides --- */
+/* --- 2. Dark Mode Overrides (Soft & Elegant) --- */
 [data-bs-theme="dark"] {
-    --niema-bg-body: #0f172a;
-    --niema-bg-sidebar: #1e293b;
-    --niema-bg-card: rgba(30, 41, 59, 0.95);
-    --niema-bg-navbar: rgba(15, 23, 42, 0.9);
+    --niema-bg-body: #1C1C1C;       /* Near-black */
+    --niema-bg-sidebar: #242424;
+    --niema-bg-card: #2A2A2A;
+    --niema-bg-navbar: rgba(28, 28, 28, 0.85);
 
-    --niema-text-main: #f1f5f9;
-    --niema-text-muted: #94a3b8;
+    --niema-text-main: #EAEAEA;     /* Softer than pure white */
+    --niema-text-muted: #A0A0A0;
 
-    --niema-border-color: rgba(255, 255, 255, 0.1);
-    --niema-hover-bg: rgba(245, 0, 87, 0.15);
+    --niema-border-color: #3A3A3A;
+    --niema-hover-bg: rgba(164, 93, 33, 0.1);
 
     /* =========================================
        BOOTSTRAP OVERRIDES (DARK MODE)
     ========================================= */
     --bs-body-bg: var(--niema-bg-body);
     --bs-body-color: var(--niema-text-main);
-    --bs-body-bg-rgb: 15, 23, 42; /* RGB dari #0f172a */
+    --bs-body-bg-rgb: 28, 28, 28;
 
     --bs-border-color: var(--niema-border-color);
     --bs-card-bg: var(--niema-bg-card);
-    --bs-secondary-bg: var(--niema-bg-sidebar); /* Contoh penggunaan secondary bg */
+    --bs-secondary-bg: var(--niema-bg-sidebar);
 }
 
 /* --- 3. Base Styles --- */
 body {
-    /* Font family sudah di-handle oleh override --bs-font-sans-serif di atas,
-       tapi tetap didefinisikan eksplisit untuk keamanan */
-    font-family: var(--font-sans), serif;
-
-    /* Background & Color sudah di-handle oleh override --bs-body-bg,
-       tapi transisi tetap perlu manual */
+    font-family: var(--font-sans);
     transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 #wrapper {
@@ -134,15 +128,6 @@ body.sb-sidenav-toggled #sidebar-wrapper {
     body.sb-sidenav-toggled #sidebar-wrapper {
         transform: translateX(0);
     }
-
-    #page-content-wrapper {
-        width: 100%;
-        flex: 1;
-    }
-
-    body.sb-sidenav-toggled #sidebar-wrapper {
-        margin-left: 0;
-    }
 }
 
 .list-group-item-action {
@@ -173,7 +158,7 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 /* Navbar Style */
 .navbar-dashboard {
     background: var(--niema-bg-navbar);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--niema-border-color);
     transition: background-color 0.3s ease;
 }
@@ -183,56 +168,44 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 }
 
 /* --- 6. Form & Inputs --- */
-/* Kita override variable bootstrap form agar lebih konsisten */
-.form-control:focus, .form-check-input:focus {
-    border-color: var(--bs-primary); /* Menggunakan var primary yg sudah di override */
-    box-shadow: 0 0 0 0.25rem rgba(var(--brand-rgb), 0.25); /* Pakai RGB untuk transparansi */
+.form-control, .form-select {
+    border-radius: 0.75rem; /* 12px */
+    border: 1px solid var(--niema-border-color);
+    background-color: var(--niema-bg-body);
+    padding: 0.75rem 1rem;
 }
 
-.form-floating > .form-control:focus ~ label,
-.form-floating > .form-control:not(:placeholder-shown) ~ label {
-    color: var(--bs-primary);
+.form-control:focus, .form-select:focus, .form-check-input:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.15);
 }
 
-/* Input Background untuk Dark Mode */
-[data-bs-theme="dark"] .form-control {
-    background-color: #0f172a;
-    border-color: #334155;
-    color: #f1f5f9;
+/* Input Background for Dark Mode */
+[data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select {
+    background-color: var(--niema-bg-sidebar);
+    border-color: var(--niema-border-color);
+    color: var(--niema-text-main);
 }
 
 [data-bs-theme="dark"] .form-floating > label {
-    color: #94a3b8;
+    color: var(--niema-text-muted);
 }
 
 /* --- 7. Components & Utilities --- */
-/* Custom Class untuk Brand (jika ingin spesifik selain .btn-primary) */
-.btn-brand {
+.btn-brand, .btn-primary {
     background-color: var(--brand-color);
     color: white;
     border: none;
     font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(var(--brand-rgb), 0.25);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.2);
 }
 
-.btn-brand:hover {
+.btn-brand:hover, .btn-primary:hover {
     background-color: var(--brand-dark);
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(var(--brand-rgb), 0.35);
-}
-
-/* Override .btn-primary bawaan Bootstrap agar sama persis dengan .btn-brand */
-.btn-primary {
-    --bs-btn-bg: var(--brand-color);
-    --bs-btn-border-color: var(--brand-color);
-    --bs-btn-hover-bg: var(--brand-dark);
-    --bs-btn-hover-border-color: var(--brand-dark);
-    --bs-btn-active-bg: var(--brand-dark);
-    --bs-btn-active-border-color: var(--brand-dark);
-    box-shadow: 0 4px 15px rgba(var(--brand-rgb), 0.25);
-    border: none; /* Hilangkan border default bootstrap */
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(var(--brand-rgb), 0.25);
 }
 
 .text-brand {
@@ -240,21 +213,16 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 }
 
 .font-serif {
-    font-family: var(--font-serif), serif;
-}
-
-.font-script {
-    font-family: var(--font-script), serif;
+    font-family: var(--font-serif);
 }
 
 /* Card Styling */
-/* Menggunakan var override agar .card bawaan bootstrap juga kena style ini */
 .card-auth, .card {
     border: 1px solid var(--niema-border-color);
-    border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04);
+    border-radius: 1.25rem; /* 20px */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
     background: var(--niema-bg-card);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
 }
 
 /* Text Utilities Fixes */
@@ -266,6 +234,8 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 .dropdown-menu {
     background-color: var(--niema-bg-card);
     border: 1px solid var(--niema-border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-item {
@@ -289,4 +259,19 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 #nprogress .spinner-icon {
     border-top-color: var(--brand-color) !important;
     border-left-color: var(--brand-color) !important;
+}
+
+/* --- 8. Dark Mode Utility Overrides --- */
+[data-bs-theme="dark"] .text-dark {
+    color: var(--niema-text-main) !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--niema-bg-sidebar) !important;
+    color: var(--niema-text-main) !important;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--niema-bg-card) !important;
+    color: var(--niema-text-main) !important;
 }

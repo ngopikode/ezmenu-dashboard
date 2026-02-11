@@ -3,73 +3,91 @@
 namespace App\Livewire\Settings;
 
 use App\Models\Restaurant;
+use App\Traits\CompressesImages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Rule;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
 class Index extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, CompressesImages;
 
     // General Info
+    #[Rule('required|string|max:255')]
     public $restaurantName;
+
+    #[Rule('required|string|max:50|alpha_dash')]
     public $subdomain;
+
+    #[Rule('nullable|string|max:20')]
     public $whatsappNumber;
+
+    #[Rule('nullable|string|max:500')]
     public $address;
+
+    #[Rule('nullable|string|max:7')]
     public $themeColor;
+
+    #[Rule('nullable|image|max:2048')]
     public $logo;
+
     public $existingLogo;
     public $isActive = true;
 
     // Hero Section
+    #[Rule('nullable|string|max:255')]
     public $heroPromoText;
+
+    #[Rule('nullable|string|max:255')]
     public $heroStatusText;
+
+    #[Rule('nullable|string|max:255')]
     public $heroHeadline;
+
+    #[Rule('nullable|string|max:255')]
     public $heroTagline;
+
+    #[Rule('nullable|url|max:255')]
     public $heroInstagramUrl;
 
     // Navbar
+    #[Rule('nullable|string|max:255')]
     public $navbarBrandText;
+
+    #[Rule('nullable|string|max:255')]
     public $navbarTitle;
+
+    #[Rule('nullable|string|max:255')]
     public $navbarSubtitle;
 
     // SEO
+    #[Rule('nullable|string|max:255')]
     public $seoTitle;
+
+    #[Rule('nullable|string|max:500')]
     public $seoDescription;
+
+    #[Rule('nullable|string|max:255')]
     public $seoKeywords;
+
+    #[Rule('nullable|string|max:255')]
     public $ogTitle;
+
+    #[Rule('nullable|string|max:500')]
     public $ogDescription;
+
+    #[Rule('nullable|image|max:2048')]
     public $ogImage;
+
     public $existingOgImage;
 
     // State
     public $activeTab = 'general';
     public $hasRestaurant = false;
     public $saved = false;
-
-    protected $rules = [
-        'restaurantName' => 'required|string|max:255',
-        'subdomain' => 'required|string|max:50|alpha_dash',
-        'whatsappNumber' => 'nullable|string|max:20',
-        'address' => 'nullable|string|max:500',
-        'themeColor' => 'nullable|string|max:7',
-        'logo' => 'nullable|image|max:1024',
-        'heroPromoText' => 'nullable|string|max:255',
-        'heroStatusText' => 'nullable|string|max:255',
-        'heroHeadline' => 'nullable|string|max:255',
-        'heroTagline' => 'nullable|string|max:255',
-        'heroInstagramUrl' => 'nullable|url|max:255',
-        'navbarBrandText' => 'nullable|string|max:255',
-        'navbarTitle' => 'nullable|string|max:255',
-        'navbarSubtitle' => 'nullable|string|max:255',
-        'seoTitle' => 'nullable|string|max:255',
-        'seoDescription' => 'nullable|string|max:500',
-        'seoKeywords' => 'nullable|string|max:255',
-        'ogTitle' => 'nullable|string|max:255',
-        'ogDescription' => 'nullable|string|max:500',
-        'ogImage' => 'nullable|image|max:1024',
-    ];
 
     public function mount()
     {
@@ -110,22 +128,25 @@ class Index extends Component
 
     public function save()
     {
-        $this->validate([
-            'restaurantName' => 'required|string|max:255',
-            'subdomain' => 'required|string|max:50|alpha_dash',
-        ]);
+        $this->validate();
 
         $user = Auth::user();
         $restaurant = $user->restaurant;
 
         $logoPath = $this->existingLogo;
         if ($this->logo) {
-            $logoPath = $this->logo->store('logos', 'public');
+            if ($this->existingLogo) {
+                Storage::disk('public')->delete($this->existingLogo);
+            }
+            $logoPath = $this->compressAndStore($this->logo, 'logos/' . $user->id);
         }
 
         $ogImagePath = $this->existingOgImage;
         if ($this->ogImage) {
-            $ogImagePath = $this->ogImage->store('og', 'public');
+            if ($this->existingOgImage) {
+                Storage::disk('public')->delete($this->existingOgImage);
+            }
+            $ogImagePath = $this->compressAndStore($this->ogImage, 'og/' . $user->id);
         }
 
         $data = [
@@ -166,6 +187,7 @@ class Index extends Component
         $this->saved = true;
     }
 
+    #[Layout('components.layouts.app')]
     public function render()
     {
         return view('livewire.settings.index');

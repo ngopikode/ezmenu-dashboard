@@ -40,7 +40,7 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->renderable(function (Throwable $e, Request $request) {
-            if ($request->is('api/*') || $request->wantsJson()) {
+            if ($request->is('api/*')) {
                 return $this->handleApiException($e, $request);
             }
         });

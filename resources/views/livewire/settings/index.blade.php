@@ -218,10 +218,8 @@
 
                             @if($hasRestaurant && $subdomain)
                                 <div class="text-center py-4">
-                                    <div class="d-inline-block p-4 bg-white rounded-4 shadow-sm border">
-                                        {{-- QR Code using a public API --}}
-                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode('https://' . $subdomain . '.ngopikode.my.id') }}"
-                                             alt="QR Code" class="img-fluid" style="max-width: 250px;">
+                                    <div id="qrcode-container" class="d-inline-block p-4 bg-white rounded-4 shadow-sm border">
+                                        {{-- QR Code will be generated here --}}
                                     </div>
                                     <p class="text-muted small mt-3">
                                         <i class="bi bi-link-45deg me-1"></i>
@@ -229,12 +227,45 @@
                                             https://{{ $subdomain }}.ngopikode.my.id
                                         </a>
                                     </p>
-                                    <a href="https://api.qrserver.com/v1/create-qr-code/?size=500x500&format=png&data={{ urlencode('https://' . $subdomain . '.ngopikode.my.id') }}" 
-                                       download="qrcode-{{ $subdomain }}.png"
-                                       class="btn btn-brand rounded-pill px-4 mt-2 shadow-sm">
+
+                                    <button onclick="downloadQR()" class="btn btn-brand rounded-pill px-4 mt-2 shadow-sm">
                                         <i class="bi bi-download me-2"></i> Download QR Code
-                                    </a>
+                                    </button>
                                 </div>
+
+                                {{-- Load QR Code Library --}}
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+                                <script>
+                                    function generateQR() {
+                                        const container = document.getElementById('qrcode-container');
+                                        if (container) {
+                                            container.innerHTML = ''; // Clear previous
+                                            new QRCode(container, {
+                                                text: "https://{{ $subdomain }}.ngopikode.my.id",
+                                                width: 250,
+                                                height: 250,
+                                                colorDark : "#000000",
+                                                colorLight : "#ffffff",
+                                                correctLevel : QRCode.CorrectLevel.H
+                                            });
+                                        }
+                                    }
+
+                                    function downloadQR() {
+                                        const img = document.querySelector('#qrcode-container img');
+                                        if (img) {
+                                            const link = document.createElement('a');
+                                            link.download = 'qrcode-{{ $subdomain }}.png';
+                                            link.href = img.src;
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }
+                                    }
+
+                                    // Run immediately
+                                    setTimeout(generateQR, 100);
+                                </script>
                             @else
                                 <div class="text-center py-5 text-muted">
                                     <i class="bi bi-qr-code" style="font-size: 3rem;"></i>
