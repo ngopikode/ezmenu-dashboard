@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MenuController;
+use App\Livewire\Dashboard;
 use App\Livewire\Menu\Index;
 use Illuminate\Support\Facades\Route;
 
@@ -23,11 +24,12 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))->group(function 
         ->name('product.preview');
 });
 
+Route::view('/', 'welcome')->name('welcome');
 
 // --- Rute untuk Dashboard Admin ---
 // Ini akan menangani domain utama: restaurant.ngopikode.com
-Route::middleware(['verified'])->group(function () {
-    Route::view('/', 'dashboard')->name('dashboard');
+Route::middleware('auth:web')->group(function () {
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // Menu Management
     Route::get('/menu', Index::class)->name('menu.index');

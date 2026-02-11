@@ -6,7 +6,7 @@
 :root {
     /* --- Elegant, Earthy Brand Colors --- */
     --brand-color: #A45D21; /* A warm, earthy brown/orange */
-    --brand-dark: #8C4E1A;  /* A slightly darker shade for hover */
+    --brand-dark: #8C4E1A; /* A slightly darker shade for hover */
     --brand-rgb: 164, 93, 33;
 
     /* --- Fonts --- */
@@ -14,16 +14,16 @@
     --font-serif: 'Plus Jakarta Sans', sans-serif; /* Modern sans for headings */
 
     /* --- Default Light Mode Variables (Soft & Elegant) --- */
-    --niema-bg-body: #FBFBFA;       /* Warm, very light off-white */
-    --niema-bg-sidebar: #FFFFFF;
-    --niema-bg-card: #FFFFFF;
-    --niema-bg-navbar: rgba(251, 251, 250, 0.85); /* Matches body bg with alpha */
+    --ezmenu-bg-body: #FBFBFA; /* Warm, very light off-white */
+    --ezmenu-bg-sidebar: #FFFFFF;
+    --ezmenu-bg-card: #FFFFFF;
+    --ezmenu-bg-navbar: rgba(251, 251, 250, 0.85); /* Matches body bg with alpha */
 
-    --niema-text-main: #334155;     /* Slate 700 - Soft black */
-    --niema-text-muted: #64748B;    /* Slate 500 */
+    --ezmenu-text-main: #334155; /* Slate 700 - Soft black */
+    --ezmenu-text-muted: #64748B; /* Slate 500 */
 
-    --niema-border-color: #F1F5F9;  /* Slate 100 - Very subtle */
-    --niema-hover-bg: rgba(164, 93, 33, 0.05); /* Faint brand color */
+    --ezmenu-border-color: #F1F5F9; /* Slate 100 - Very subtle */
+    --ezmenu-hover-bg: rgba(164, 93, 33, 0.05); /* Faint brand color */
 
     /* =========================================
        BOOTSTRAP OVERRIDES (LIGHT MODE)
@@ -31,39 +31,39 @@
     --bs-primary: var(--brand-color);
     --bs-primary-rgb: var(--brand-rgb);
 
-    --bs-body-bg: var(--niema-bg-body);
-    --bs-body-color: var(--niema-text-main);
+    --bs-body-bg: var(--ezmenu-bg-body);
+    --bs-body-color: var(--ezmenu-text-main);
 
     --bs-link-color: var(--brand-color);
     --bs-link-hover-color: var(--brand-dark);
 
-    --bs-border-color: var(--niema-border-color);
+    --bs-border-color: var(--ezmenu-border-color);
     --bs-font-sans-serif: var(--font-sans);
 }
 
 /* --- 2. Dark Mode Overrides (Soft & Elegant) --- */
 [data-bs-theme="dark"] {
-    --niema-bg-body: #1C1C1C;       /* Near-black */
-    --niema-bg-sidebar: #242424;
-    --niema-bg-card: #2A2A2A;
-    --niema-bg-navbar: rgba(28, 28, 28, 0.85);
+    --ezmenu-bg-body: #1C1C1C; /* Near-black */
+    --ezmenu-bg-sidebar: #242424;
+    --ezmenu-bg-card: #2A2A2A;
+    --ezmenu-bg-navbar: rgba(28, 28, 28, 0.85);
 
-    --niema-text-main: #EAEAEA;     /* Softer than pure white */
-    --niema-text-muted: #A0A0A0;
+    --ezmenu-text-main: #EAEAEA; /* Softer than pure white */
+    --ezmenu-text-muted: #A0A0A0;
 
-    --niema-border-color: #3A3A3A;
-    --niema-hover-bg: rgba(164, 93, 33, 0.1);
+    --ezmenu-border-color: #3A3A3A;
+    --ezmenu-hover-bg: rgba(164, 93, 33, 0.1);
 
     /* =========================================
        BOOTSTRAP OVERRIDES (DARK MODE)
     ========================================= */
-    --bs-body-bg: var(--niema-bg-body);
-    --bs-body-color: var(--niema-text-main);
+    --bs-body-bg: var(--ezmenu-bg-body);
+    --bs-body-color: var(--ezmenu-text-main);
     --bs-body-bg-rgb: 28, 28, 28;
 
-    --bs-border-color: var(--niema-border-color);
-    --bs-card-bg: var(--niema-bg-card);
-    --bs-secondary-bg: var(--niema-bg-sidebar);
+    --bs-border-color: var(--ezmenu-border-color);
+    --bs-card-bg: var(--ezmenu-bg-card);
+    --bs-secondary-bg: var(--ezmenu-bg-sidebar);
 }
 
 /* --- 3. Base Styles --- */
@@ -84,8 +84,8 @@ body {
 #sidebar-wrapper {
     min-width: 280px;
     max-width: 280px;
-    background-color: var(--niema-bg-sidebar);
-    border-right: 1px solid var(--niema-border-color);
+    background-color: var(--ezmenu-bg-sidebar);
+    border-right: 1px solid var(--ezmenu-border-color);
     transition: margin 0.3s ease-in-out, background-color 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -107,7 +107,7 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 /* Mobile styles handled by Offcanvas now */
 
 .list-group-item-action {
-    color: var(--niema-text-muted);
+    color: var(--ezmenu-text-muted);
     background-color: transparent;
     border: none;
     font-weight: 500;
@@ -120,34 +120,34 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 }
 
 .list-group-item-action:hover {
-    background-color: var(--niema-hover-bg);
+    background-color: var(--ezmenu-hover-bg);
     color: var(--brand-color);
 }
 
 .list-group-item-action.active {
     color: var(--brand-color);
-    background: linear-gradient(90deg, var(--niema-hover-bg) 0%, transparent 100%);
+    background: linear-gradient(90deg, var(--ezmenu-hover-bg) 0%, transparent 100%);
     border-left-color: var(--brand-color);
     font-weight: 600;
 }
 
 /* Navbar Style */
 .navbar-dashboard {
-    background: var(--niema-bg-navbar);
+    background: var(--ezmenu-bg-navbar);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--niema-border-color);
+    border-bottom: 1px solid var(--ezmenu-border-color);
     transition: background-color 0.3s ease;
 }
 
 .navbar-dashboard h5, .navbar-dashboard .text-dark {
-    color: var(--niema-text-main) !important;
+    color: var(--ezmenu-text-main) !important;
 }
 
 /* --- 6. Form & Inputs --- */
 .form-control, .form-select {
     border-radius: 0.75rem; /* 12px */
-    border: 1px solid var(--niema-border-color);
-    background-color: var(--niema-bg-body);
+    border: 1px solid var(--ezmenu-border-color);
+    background-color: var(--ezmenu-bg-body);
     padding: 0.75rem 1rem;
 }
 
@@ -158,13 +158,13 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 /* Input Background for Dark Mode */
 [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select {
-    background-color: var(--niema-bg-sidebar);
-    border-color: var(--niema-border-color);
-    color: var(--niema-text-main);
+    background-color: var(--ezmenu-bg-sidebar);
+    border-color: var(--ezmenu-border-color);
+    color: var(--ezmenu-text-main);
 }
 
 [data-bs-theme="dark"] .form-floating > label {
-    color: var(--niema-text-muted);
+    color: var(--ezmenu-text-muted);
 }
 
 /* --- 7. Components & Utilities --- */
@@ -194,32 +194,32 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 /* Card Styling */
 .card-auth, .card {
-    border: 1px solid var(--niema-border-color);
+    border: 1px solid var(--ezmenu-border-color);
     border-radius: 1.25rem; /* 20px */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-    background: var(--niema-bg-card);
+    background: var(--ezmenu-bg-card);
     backdrop-filter: blur(12px);
 }
 
 /* Text Utilities Fixes */
 .text-muted {
-    color: var(--niema-text-muted) !important;
+    color: var(--ezmenu-text-muted) !important;
 }
 
 /* Dropdown Menu Fix */
 .dropdown-menu {
-    background-color: var(--niema-bg-card);
-    border: 1px solid var(--niema-border-color);
+    background-color: var(--ezmenu-bg-card);
+    border: 1px solid var(--ezmenu-border-color);
     border-radius: 0.75rem;
     box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-item {
-    color: var(--niema-text-main);
+    color: var(--ezmenu-text-main);
 }
 
 .dropdown-item:hover {
-    background-color: var(--niema-hover-bg);
+    background-color: var(--ezmenu-hover-bg);
 }
 
 /* NProgress */
@@ -239,23 +239,23 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 /* --- 8. Dark Mode Utility Overrides --- */
 [data-bs-theme="dark"] .text-dark {
-    color: var(--niema-text-main) !important;
+    color: var(--ezmenu-text-main) !important;
 }
 
 [data-bs-theme="dark"] .bg-light {
-    background-color: var(--niema-bg-sidebar) !important;
-    color: var(--niema-text-main) !important;
+    background-color: var(--ezmenu-bg-sidebar) !important;
+    color: var(--ezmenu-text-main) !important;
 }
 
 [data-bs-theme="dark"] .bg-white {
-    background-color: var(--niema-bg-card) !important;
-    color: var(--niema-text-main) !important;
+    background-color: var(--ezmenu-bg-card) !important;
+    color: var(--ezmenu-text-main) !important;
 }
 
 /* Offcanvas Dark Mode Fix */
 [data-bs-theme="dark"] .offcanvas {
-    background-color: var(--niema-bg-sidebar);
-    color: var(--niema-text-main);
+    background-color: var(--ezmenu-bg-sidebar);
+    color: var(--ezmenu-text-main);
 }
 
 [data-bs-theme="dark"] .btn-close {
