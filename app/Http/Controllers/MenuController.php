@@ -24,13 +24,11 @@ class MenuController extends Controller
      */
     public function showProductPreview(Request $request, string $subdomain, string $productId)
     {
-        $userAgent = strtolower(request()->header('User-Agent'));
-
-
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
 
         $orderColumn = explode('-', $productId)[1] ?? null;
+        dd($orderColumn);
         $product = Product::where('restaurant_id', $restaurant->id)
             ->where('order_column', $orderColumn)
             ->firstOrFail();
@@ -41,6 +39,7 @@ class MenuController extends Controller
         $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl";
 
+        $userAgent = strtolower(request()->header('User-Agent'));
         if (
             str_contains($userAgent, 'whatsapp') ||
             str_contains($userAgent, 'facebookexternalhit') ||
