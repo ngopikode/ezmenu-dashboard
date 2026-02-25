@@ -26,6 +26,7 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))
         // --- Rute untuk Rich Preview ---
         // Ini akan menangani URL seperti: /menu/1
         Route::get('/menu/{productId}', [MenuController::class, 'showProductPreview'])->name('product.preview');
+        Route::get('/menu/{productId}/story', [MenuController::class, 'shareAsStory'])->name('product.story');
 
         // --- Rute untuk Dashboard Admin ---
         Route::middleware('auth:web')->group(function () {

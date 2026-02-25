@@ -11,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MenuController extends Controller
 {
@@ -58,5 +60,84 @@ class MenuController extends Controller
         }
 
         return redirect("$fullReactUrl#$productId");
+    }
+
+    public function shareAsStory(Request $request, $subdomain, $productId)
+    {
+        $restaurant = $request->restaurant;
+        $orderColumn = explode('-', $productId)[1] ?? null;
+        $product = Product::where('restaurant_id', $restaurant->id)
+            ->where('order_column', $orderColumn)
+            ->firstOrFail();
+
+        // Path ke gambar produk
+        $productImagePath = Storage::disk('public')->path($product->image);
+
+        // Buat canvas utama
+        $img = Image::canvas(1080, 1920, '#ffffff');
+
+        // Tambahkan gambar produk sebagai background, di-blur dan digelapkan
+        $backgroundImage = Image::make($productImagePath)->fit(1080, 1920, function ($constraint) {
+            $constraint->upsize();
+        })->blur(50)->brightness(-25);
+        $img->insert($backgroundImage, 'center');
+
+        // Tambahkan gambar produk utama di tengah
+        $mainImage = Image::make($productImagePath)->resize(800, null, function ($constraint) {
+            $constraint->aspectRatio();
+            $constraint->upsize();
+        });
+        $img->insert($mainImage, 'center');
+
+        // Tambahkan Nama Produk
+        $img->text($product->name, 540, 1350, function ($font) {
+            $font->file(public_path('fonts/Poppins-Bold.ttf'));
+            $font->size(80);
+            $font->color('#ffffff');
+            $font->align('center');
+            $font->valign('bottom');
+        });
+
+        // Tambahkan Harga
+        $img->text('Rp ' . number_format($product->price, 0, ',', '.'), 540, 1450, function ($font) {
+            $font->file(public_path('fonts/Poppins-Regular.ttf'));
+            $font->size(60);
+            $font->color('#ffdd00');
+            $font->align('center');
+            $font->valign('bottom');
+        });
+
+        // Generate URL Produk
+        $reactAppBaseUrl = config('app.frontend_url_base');
+        $protocol = $request->isSecure() ? 'https' : 'http';
+        $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl#$productId";
+
+        // Tambahkan QR Code
+        // Pastikan library simple-qrcode terinstall: composer require simplesoftwareio/simple-qrcode
+        $qrCode = QrCode::format('png')->size(250)->margin(1)->generate($fullReactUrl);
+        $qrImage = Image::make($qrCode);
+
+        // Insert QR Code di bagian bawah
+        $img->insert($qrImage, 'bottom-center', 0, 250);
+
+        // Tambahkan Call to Action Text di bawah QR Code
+        $img->text('Scan untuk pesan', 540, 1720, function ($font) {
+            $font->file(public_path('fonts/Poppins-Regular.ttf'));
+            $font->size(30);
+            $font->color('#ffffff');
+            $font->align('center');
+            $font->valign('top');
+        });
+
+        // Tambahkan Nama Restoran di paling bawah
+        $img->text($restaurant->name, 540, 1850, function ($font) {
+            $font->file(public_path('fonts/Poppins-Light.ttf'));
+            $font->size(40);
+            $font->color('#ffffff');
+            $font->align('center');
+            $font->valign('bottom');
+        });
+
+        return $img->response('jpg');
     }
 }
