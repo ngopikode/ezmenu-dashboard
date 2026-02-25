@@ -48,7 +48,7 @@
                     Share ke WhatsApp
                 </button>
 
-                <a href="{{ route('product.story.image', ['subdomain' => request()->route('subdomain'), 'productId' => request()->route('productId')]) }}" download class="block w-full bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl text-center transition hover:bg-gray-50">
+                <a href="{{ route('product.story.image', ['subdomain' => request()->route('subdomain'), 'productId' => request()->route('productId')]) }}" class="block w-full bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl text-center transition hover:bg-gray-50">
                     Download Gambar Story
                 </a>
             </div>
@@ -56,51 +56,23 @@
     </div>
 
     <script>
-        const item = {
-            name: "{{ addslashes($product->name) }}",
-            description: "{{ addslashes(Str::limit($product->description, 100)) }}",
-            price: {{ $product->price }}
-        };
-        const restaurantName = "{{ addslashes($restaurant->name) }}";
-        const productUrl = "{{ $product_url }}";
-
-        const formatPrice = (price) => {
-            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
+        // Data dari Controller (PHP)
+        const shareData = {
+            title: "{{ addslashes($share_title) }}",
+            text: `{!! json_encode($share_text) !!}`.slice(1, -1), // Hack untuk handle newline dari PHP ke JS string
+            url: "{{ $product_url }}"
         };
 
         const handleShare = async () => {
-            const generalHooks = [
-                '✨ *Barangkali lagi kepikiran ini...*',
-                '🌟 *Salah satu yang paling sering dicari nih,*',
-                '📍 *Jangan sampai kelewat yang satu ini ya,*',
-                '🍃 *Pilihan pas buat nemenin hari kamu,*',
-                '🤍 *Rekomendasi spesial buat kamu,*',
-                '💡 *Cek deh, siapa tahu kamu suka,*'
-            ];
-
-            const randomHook = generalHooks[Math.floor(Math.random() * generalHooks.length)];
-
-            let shareText = `${randomHook}\n\n`;
-            shareText += `*${item.name}* @ *${restaurantName}*\n`;
-            if(item.description) {
-                shareText += `_"${item.description}"_\n\n`;
-            }
-            shareText += `Harganya cuma *${formatPrice(item.price)}* aja lho. ✨\n\n`;
-            shareText += `Cek selengkapnya atau langsung order di sini ya:\n`;
-            shareText += `${productUrl}`;
-
             if (navigator.share) {
                 try {
-                    await navigator.share({
-                        title: `${item.name} - ${restaurantName}`,
-                        text: shareText,
-                        url: productUrl
-                    });
+                    await navigator.share(shareData);
                 } catch (err) {
                     console.error('Gagal membagikan:', err);
                 }
             } else {
-                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+                // Fallback ke WhatsApp Web
+                const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareData.text)}`;
                 window.open(whatsappUrl, '_blank');
             }
         };

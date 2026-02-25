@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Typography\FontFactory;
 
@@ -78,11 +79,36 @@ class MenuController extends Controller
 
         $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
 
+        // --- LOGIKA WORDING DI SINI ---
+        $generalHooks = [
+            '✨ *Barangkali lagi kepikiran ini...*',
+            '🌟 *Salah satu yang paling sering dicari nih,*',
+            '📍 *Jangan sampai kelewat yang satu ini ya,*',
+            '🍃 *Pilihan pas buat nemenin hari kamu,*',
+            '🤍 *Rekomendasi spesial buat kamu,*',
+            '💡 *Cek deh, siapa tahu kamu suka,*'
+        ];
+
+        $randomHook = $generalHooks[array_rand($generalHooks)];
+        $priceFormatted = 'Rp ' . number_format($product->price, 0, ',', '.');
+
+        $shareText = "{$randomHook}\n\n";
+        $shareText .= "*{$product->name}* @ *{$restaurant->name}*\n";
+        if ($product->description) {
+            $shareText .= "_\"{$product->description}\"_\n\n";
+        } else {
+            $shareText .= "\n";
+        }
+        $shareText .= "Harganya cuma *{$priceFormatted}* aja lho. ✨\n\n";
+        $shareText .= "Cek selengkapnya atau langsung order di sini ya:\n";
+
         return view('story_preview', [
             'restaurant' => $restaurant,
             'product' => $product,
             'image_url' => $imageUrl,
-            'product_url' => $productUrl
+            'product_url' => $productUrl,
+            'share_text' => $shareText, // Kirim teks yang sudah jadi ke view
+            'share_title' => "{$product->name} - {$restaurant->name}"
         ]);
     }
 
@@ -100,8 +126,11 @@ class MenuController extends Controller
         // --- CACHING STRATEGY ---
         $cacheFileName = "stories/{$restaurant->id}/{$product->id}_{$product->updated_at->timestamp}.jpg";
 
+        // Nama file download yang cantik (slugified)
+        $downloadName = Str::slug($product->name) . '-story.jpg';
+
         if (Storage::disk('public')->exists($cacheFileName)) {
-            return response()->file(Storage::disk('public')->path($cacheFileName), [
+            return response()->download(Storage::disk('public')->path($cacheFileName), $downloadName, [
                 'Content-Type' => 'image/jpeg'
             ]);
         }
@@ -142,7 +171,7 @@ class MenuController extends Controller
         $img->place($mainImage, 'center');
 
         // --- FONT HANDLING ---
-        $getFont = function($fontName) {
+        $getFont = function ($fontName) {
             $path = public_path("fonts/{$fontName}");
             return file_exists($path) ? $path : null;
         };
@@ -204,7 +233,7 @@ class MenuController extends Controller
 
         $img->save(Storage::disk('public')->path($cacheFileName), 80);
 
-        return response()->file(Storage::disk('public')->path($cacheFileName), [
+        return response()->download(Storage::disk('public')->path($cacheFileName), $downloadName, [
             'Content-Type' => 'image/jpeg'
         ]);
     }
