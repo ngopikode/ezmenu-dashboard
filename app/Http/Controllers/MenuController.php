@@ -28,7 +28,6 @@ class MenuController extends Controller
         $restaurant = $request->restaurant;
 
         $orderColumn = explode('-', $productId)[1] ?? null;
-        dd($orderColumn);
         $product = Product::where('restaurant_id', $restaurant->id)
             ->where('order_column', $orderColumn)
             ->firstOrFail();
