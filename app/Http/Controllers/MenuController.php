@@ -65,7 +65,6 @@ class MenuController extends Controller
 
     public function shareAsStory(Request $request, $subdomain, $productId)
     {
-        // Set time limit sedikit lebih panjang untuk jaga-jaga saat generate pertama kali
         set_time_limit(60);
 
         $restaurant = $request->restaurant;
@@ -75,21 +74,15 @@ class MenuController extends Controller
             ->firstOrFail();
 
         // --- CACHING STRATEGY ---
-        // Nama file cache unik berdasarkan ID dan Timestamp update terakhir.
-        // Jika produk diedit, timestamp berubah -> nama file baru -> generate ulang.
         $cacheFileName = "stories/{$restaurant->id}/{$product->id}_{$product->updated_at->timestamp}.jpg";
 
-        // Cek apakah file cache sudah ada
         if (Storage::disk('public')->exists($cacheFileName)) {
-            // Jika ada, langsung return file tersebut tanpa proses image processing sama sekali!
             return response()->file(Storage::disk('public')->path($cacheFileName), [
                 'Content-Type' => 'image/jpeg'
             ]);
         }
 
-        // --- JIKA BELUM ADA DI CACHE, GENERATE GAMBAR ---
-
-        // Hapus cache lama untuk produk ini agar tidak menumpuk sampah file
+        // Hapus cache lama
         $oldFiles = Storage::disk('public')->files("stories/{$restaurant->id}");
         foreach ($oldFiles as $file) {
             if (str_contains($file, "{$product->id}_")) {
@@ -97,23 +90,19 @@ class MenuController extends Controller
             }
         }
 
-        // Path ke gambar produk asli
         $productImagePath = Storage::disk('public')->path($product->image);
 
-        // Gunakan resolusi HD (720x1280) bukan Full HD untuk hemat CPU & RAM
+        // Canvas HD (720x1280)
         $canvasWidth = 720;
         $canvasHeight = 1280;
 
         $img = Image::create($canvasWidth, $canvasHeight)->fill('#ffffff');
 
-        // --- BACKGROUND (Fake Blur Technique) ---
-        // Resize sangat kecil (36x64 px) lalu resize besar lagi.
-        // Ini menciptakan efek blur alami tanpa kalkulasi Gaussian Blur yang berat.
+        // --- BACKGROUND (Fake Blur) ---
         $backgroundImage = Image::read($productImagePath);
         $backgroundImage->cover(36, 64);
         $backgroundImage->resize($canvasWidth, $canvasHeight);
 
-        // Overlay gelap (hemat CPU dibanding brightness adjustment)
         $overlay = Image::create($canvasWidth, $canvasHeight)->fill('rgba(0, 0, 0, 0.35)');
         $backgroundImage->place($overlay);
 
@@ -121,25 +110,43 @@ class MenuController extends Controller
 
         // --- MAIN IMAGE ---
         $mainImage = Image::read($productImagePath);
-        // Resize ke lebar 550px (cukup tajam untuk layar HP)
         $mainImage->scale(width: 550);
         $img->place($mainImage, 'center');
 
-        // --- TEXT & QR (Koordinat disesuaikan untuk 720x1280) ---
+        // --- FONT HANDLING ---
+        // Helper function untuk memilih font yang aman
+        $getFont = function($fontName) {
+            $path = public_path("fonts/{$fontName}");
+            return file_exists($path) ? $path : null;
+        };
+
+        $fontBold = $getFont('Poppins-Bold.ttf');
+        $fontRegular = $getFont('Poppins-Regular.ttf');
+        $fontLight = $getFont('Poppins-Light.ttf');
+
+        // --- TEXT & QR ---
 
         // Nama Produk
-        $img->text($product->name, $canvasWidth / 2, 900, function (FontFactory $font) {
-            $font->filename(public_path('fonts/Poppins-Bold.ttf'));
-            $font->size(50); // Font size disesuaikan
+        $img->text($product->name, $canvasWidth / 2, 900, function (FontFactory $font) use ($fontBold) {
+            if ($fontBold) {
+                $font->filename($fontBold);
+                $font->size(50);
+            } else {
+                $font->file(5); // Fallback ke font internal GD terbesar
+            }
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('bottom');
         });
 
         // Harga
-        $img->text('Rp ' . number_format($product->price, 0, ',', '.'), $canvasWidth / 2, 980, function (FontFactory $font) {
-            $font->filename(public_path('fonts/Poppins-Regular.ttf'));
-            $font->size(40);
+        $img->text('Rp ' . number_format($product->price, 0, ',', '.'), $canvasWidth / 2, 980, function (FontFactory $font) use ($fontRegular) {
+            if ($fontRegular) {
+                $font->filename($fontRegular);
+                $font->size(40);
+            } else {
+                $font->file(4);
+            }
             $font->color('#ffdd00');
             $font->align('center');
             $font->valign('bottom');
@@ -150,41 +157,43 @@ class MenuController extends Controller
         $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl#$productId";
 
-        // Generate QR (Ukuran lebih kecil: 180px)
         $qrCode = QrCode::format('png')->size(180)->margin(1)->generate($fullReactUrl);
         $qrImage = Image::read($qrCode);
-
-        // Posisi QR (offset 180 dari bawah)
         $img->place($qrImage, 'bottom-center', 0, 180);
 
         // Call to Action
-        $img->text('Scan untuk pesan', $canvasWidth / 2, 1150, function (FontFactory $font) {
-            $font->filename(public_path('fonts/Poppins-Regular.ttf'));
-            $font->size(20);
+        $img->text('Scan untuk pesan', $canvasWidth / 2, 1150, function (FontFactory $font) use ($fontRegular) {
+            if ($fontRegular) {
+                $font->filename($fontRegular);
+                $font->size(20);
+            } else {
+                $font->file(3);
+            }
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('top');
         });
 
         // Nama Restoran
-        $img->text($restaurant->name, $canvasWidth / 2, 1230, function (FontFactory $font) {
-            $font->filename(public_path('fonts/Poppins-Light.ttf'));
-            $font->size(24);
+        $img->text($restaurant->name, $canvasWidth / 2, 1230, function (FontFactory $font) use ($fontLight) {
+            if ($fontLight) {
+                $font->filename($fontLight);
+                $font->size(24);
+            } else {
+                $font->file(3);
+            }
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('bottom');
         });
 
         // Simpan ke Cache
-        // Pastikan direktori ada
         if (!Storage::disk('public')->exists("stories/{$restaurant->id}")) {
             Storage::disk('public')->makeDirectory("stories/{$restaurant->id}");
         }
 
-        // Save kualitas 80% (cukup bagus, file size kecil)
         $img->save(Storage::disk('public')->path($cacheFileName), 80);
 
-        // Return file yang baru saja dibuat
         return response()->file(Storage::disk('public')->path($cacheFileName), [
             'Content-Type' => 'image/jpeg'
         ]);
