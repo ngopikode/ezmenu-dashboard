@@ -57,6 +57,6 @@ class MenuController extends Controller
 
         }
 
-        return redirect("$fullReactUrl#product-$productId");
+        return redirect("$fullReactUrl#$productId");
     }
 }
