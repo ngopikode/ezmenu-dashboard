@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ClientApiController extends Controller
@@ -15,18 +16,13 @@ class ClientApiController extends Controller
     /**
      * Handle the incoming request.
      *
-     * @param string $subdomain
-     * @return \Illuminate\Http\JsonResponse
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function __invoke(string $subdomain): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
-        $restaurant = Restaurant::where('subdomain', $subdomain)
-            ->where('is_active', true)
-            ->first();
-
-        if (!$restaurant) {
-            return $this->failResponse(message: 'Restaurant not found or not active.', code: 404);
-        }
+        /** @var Restaurant $restaurant */
+        $restaurant = $request->restaurant;
 
         // Eager load products with their category and options
         $products = $restaurant->products()->with(['category', 'options'])->get();

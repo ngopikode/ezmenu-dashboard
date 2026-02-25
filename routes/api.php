@@ -20,7 +20,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/client/{subdomain}', ClientApiController::class);
 
-Route::post('/orders/{subdomain}', [OrderApiController::class, 'store'])
-    ->middleware('throttle:orders');
+$frontEndUrlBase = config('app.frontend_url_base');
+Route::domain("{subdomain}.$frontEndUrlBase")->middleware('validateSubdomain')->group(function () {
+    Route::get('/client', ClientApiController::class);
+
+    Route::post('/orders', [OrderApiController::class, 'store'])
+        ->middleware('throttle:orders');
+});

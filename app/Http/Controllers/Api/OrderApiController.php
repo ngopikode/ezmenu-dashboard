@@ -18,14 +18,12 @@ class OrderApiController extends Controller
      * Store a newly created resource in storage.
      *
      * @param \App\Http\Requests\OrderApiRequest $request
-     * @param string $subdomain
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(OrderApiRequest $request, string $subdomain): JsonResponse
+    public function store(OrderApiRequest $request): JsonResponse
     {
-        // The authorization logic is now handled by the OrderApiRequest.
-        // We can safely retrieve the restaurant.
-        $restaurant = Restaurant::where('subdomain', $subdomain)->firstOrFail();
+        /** @var Restaurant $restaurant */
+        $restaurant = $request->restaurant;
 
         try {
             $order = DB::transaction(function () use ($request, $restaurant) {
