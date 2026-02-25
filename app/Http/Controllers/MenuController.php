@@ -13,7 +13,6 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 use Intervention\Image\Typography\FontFactory;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MenuController extends Controller
 {
@@ -63,7 +62,32 @@ class MenuController extends Controller
         return redirect("$fullReactUrl#$productId");
     }
 
+    // Menampilkan halaman preview story (HTML)
     public function shareAsStory(Request $request, $subdomain, $productId)
+    {
+        $restaurant = $request->restaurant;
+        $orderColumn = explode('-', $productId)[1] ?? null;
+        $product = Product::where('restaurant_id', $restaurant->id)
+            ->where('order_column', $orderColumn)
+            ->firstOrFail();
+
+        $reactAppBaseUrl = config('app.frontend_url_base');
+        $protocol = $request->isSecure() ? 'https' : 'http';
+        $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl";
+        $productUrl = "$fullReactUrl#$productId";
+
+        $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
+
+        return view('story_preview', [
+            'restaurant' => $restaurant,
+            'product' => $product,
+            'image_url' => $imageUrl,
+            'product_url' => $productUrl
+        ]);
+    }
+
+    // Men-generate gambar story (JPEG)
+    public function generateStoryImage(Request $request, $subdomain, $productId)
     {
         set_time_limit(60);
 
@@ -92,7 +116,6 @@ class MenuController extends Controller
 
         $productImagePath = Storage::disk('public')->path($product->image);
 
-        // Cek apakah file gambar produk ada
         if (!file_exists($productImagePath)) {
             abort(404, 'Product image not found');
         }
@@ -119,7 +142,7 @@ class MenuController extends Controller
         $img->place($mainImage, 'center');
 
         // --- FONT HANDLING ---
-        $getFont = function ($fontName) {
+        $getFont = function($fontName) {
             $path = public_path("fonts/{$fontName}");
             return file_exists($path) ? $path : null;
         };
@@ -152,31 +175,11 @@ class MenuController extends Controller
             });
         }
 
-        // --- QR CODE HANDLING ---
-        $reactAppBaseUrl = config('app.frontend_url_base');
-        $protocol = $request->isSecure() ? 'https' : 'http';
-        $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl#$productId";
-
-        // Generate QR sebagai string binary PNG
-        $qrCodeString = QrCode::format('png')->size(180)->margin(1)->generate($fullReactUrl);
-
-        // Pastikan input ke Image::read() valid
-        // Kita bisa membungkusnya dalam stream atau langsung string jika library support
-        // Untuk amannya, kita coba baca string langsung. Jika error, mungkin perlu konversi base64 atau stream.
-        try {
-            $qrImage = Image::read($qrCodeString);
-            $img->place($qrImage, 'bottom-center', 0, 180);
-        } catch (\Exception $e) {
-            // Fallback jika gagal baca QR (misal format tidak dikenali)
-            // Log error atau skip QR
-            // \Log::error("QR Code generation failed: " . $e->getMessage());
-        }
-
-        // Call to Action
+        // Call to Action (Tanpa QR)
         if ($fontRegular) {
-            $img->text('Scan untuk pesan', $canvasWidth / 2, 1150, function (FontFactory $font) use ($fontRegular) {
+            $img->text('Cek menu lengkap di link bio!', $canvasWidth / 2, 1150, function (FontFactory $font) use ($fontRegular) {
                 $font->filename($fontRegular);
-                $font->size(20);
+                $font->size(24);
                 $font->color('#ffffff');
                 $font->align('center');
                 $font->valign('top');
