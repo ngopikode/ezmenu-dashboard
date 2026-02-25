@@ -17,18 +17,17 @@ class MenuController extends Controller
      * @param int $productId
      * @return View
      */
-    public function showProductPreview(Request $request, int $productId): View
+    public function showProductPreview(Request $request, $productId): View
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
 
         $product = Product::where('restaurant_id', $restaurant->id)->findOrFail($productId);
 
-
         // Menggunakan frontend_url_base dari config
         $reactAppBaseUrl = config('app.frontend_url_base');
 
-        $protocol = request()->isSecure() ? 'https' : 'http';
+        $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "{$protocol}://{$restaurant->subdomain}.{$reactAppBaseUrl}";
         $imageUrl = $product->image ? "$fullReactUrl/" . asset(Storage::url($product->image)) : null;
 
