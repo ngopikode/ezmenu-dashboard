@@ -9,7 +9,7 @@
     <meta property="og:title" content="{{ $product->name }} di {{ $restaurant->name }}"/>
     <meta property="og:description" content="{{ $product->description }}"/>
     <meta property="og:image" content="{{ $image_url }}"/>
-    <meta property="og:url" content="{{ $react_app_url }}"/>
+    <meta property="og:url" content="{{ url()->current() }}"/>
     <meta property="og:type" content="website"/>
     <meta property="og:site_name" content="{{ $restaurant->name }}"/>
 
@@ -25,10 +25,5 @@
 </head>
 <body>
 <h1>Memuat {{ $product->name }}...</h1>
-<p>Anda akan dialihkan ke menu kami...</p>
-
-<script>
-    window.location.replace("{{ $react_app_url }}#product-{{ $product->id }}");
-</script>
 </body>
 </html>
