@@ -30,8 +30,9 @@ class MenuController extends Controller
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
 
+        $orderColumn = explode('-', $productId)[1] ?? null;
         $product = Product::where('restaurant_id', $restaurant->id)
-            ->where('order_column', $productId)
+            ->where('order_column', $orderColumn)
             ->firstOrFail();
 
         // Menggunakan frontend_url_base dari config
