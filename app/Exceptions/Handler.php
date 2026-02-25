@@ -45,12 +45,10 @@ class Handler extends ExceptionHandler
                 return $this->handleApiException($e, $request);
             }
 
-            if (method_exists($e, 'getStatusCode') && $e->getStatusCode() >= 500) {
-                TelegramHelper::reportToTelegram(
-                    errors: $e,
-                    request: $request
-                );
-            }
+            TelegramHelper::reportToTelegram(
+                errors: $e,
+                request: $request
+            );
         });
     }
 

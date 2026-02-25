@@ -73,21 +73,24 @@ class MenuController extends Controller
         // Path ke gambar produk
         $productImagePath = Storage::disk('public')->path($product->image);
 
-        // Buat canvas utama
-        $img = Image::canvas(1080, 1920, '#ffffff');
+        // Buat canvas utama (Intervention Image v3)
+        $img = Image::create(1080, 1920)->fill('#ffffff');
 
-        // Tambahkan gambar produk sebagai background, di-blur dan digelapkan
-        $backgroundImage = Image::make($productImagePath)->fit(1080, 1920, function ($constraint) {
-            $constraint->upsize();
-        })->blur(50)->brightness(-25);
-        $img->insert($backgroundImage, 'center');
+        // Tambahkan gambar produk sebagai background
+        $backgroundImage = Image::read($productImagePath);
+        $backgroundImage->cover(1080, 1920);
+        $backgroundImage->blur(50);
+
+        // Gelapkan background dengan overlay hitam transparan
+        $overlay = Image::create(1080, 1920)->fill('rgba(0, 0, 0, 0.3)');
+        $backgroundImage->place($overlay);
+
+        $img->place($backgroundImage);
 
         // Tambahkan gambar produk utama di tengah
-        $mainImage = Image::make($productImagePath)->resize(800, null, function ($constraint) {
-            $constraint->aspectRatio();
-            $constraint->upsize();
-        });
-        $img->insert($mainImage, 'center');
+        $mainImage = Image::read($productImagePath);
+        $mainImage->scale(width: 800);
+        $img->place($mainImage, 'center');
 
         // Tambahkan Nama Produk
         $img->text($product->name, 540, 1350, function ($font) {
@@ -113,12 +116,11 @@ class MenuController extends Controller
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl#$productId";
 
         // Tambahkan QR Code
-        // Pastikan library simple-qrcode terinstall: composer require simplesoftwareio/simple-qrcode
         $qrCode = QrCode::format('png')->size(250)->margin(1)->generate($fullReactUrl);
-        $qrImage = Image::make($qrCode);
+        $qrImage = Image::read($qrCode);
 
         // Insert QR Code di bagian bawah
-        $img->insert($qrImage, 'bottom-center', 0, 250);
+        $img->place($qrImage, 'bottom-center', 0, 250);
 
         // Tambahkan Call to Action Text di bawah QR Code
         $img->text('Scan untuk pesan', 540, 1720, function ($font) {
@@ -138,6 +140,6 @@ class MenuController extends Controller
             $font->valign('bottom');
         });
 
-        return $img->response('jpg');
+        return response($img->toJpeg(), 200, ['Content-Type' => 'image/jpeg']);
     }
 }
