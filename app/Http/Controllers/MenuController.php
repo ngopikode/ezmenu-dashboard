@@ -30,7 +30,7 @@ class MenuController extends Controller
 
         $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl";
-        $imageUrl = $product->image ? "$fullReactUrl/" . asset(Storage::url($product->image)) : null;
+        $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
 
         return view('product_preview', [
             'restaurant' => $restaurant,
