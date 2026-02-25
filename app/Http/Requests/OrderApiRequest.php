@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Restaurant;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,13 +14,9 @@ class OrderApiRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        /** @var string $subdomain */
-        $subdomain = $this->route('subdomain');
-
-        // The request is authorized only if the subdomain belongs to an active restaurant.
-        return Restaurant::where('subdomain', $subdomain)
-            ->where('is_active', true)
-            ->exists();
+        // The middleware already validates the restaurant and merges it into the request.
+        // So we just need to check if the restaurant is present.
+        return $this->has('restaurant') || $this->attributes->has('restaurant');
     }
 
     /**
