@@ -75,7 +75,7 @@ class MenuController extends Controller
         $reactAppBaseUrl = config('app.frontend_url_base');
         $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl";
-        $productUrl = "$fullReactUrl#$productId";
+        $productUrl = "$fullReactUrl/menu/$productId";
 
         $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
 
