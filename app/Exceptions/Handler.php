@@ -9,6 +9,7 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -45,10 +46,17 @@ class Handler extends ExceptionHandler
                 return $this->handleApiException($e, $request);
             }
 
-            TelegramHelper::reportToTelegram(
-                errors: $e,
-                request: $request
-            );
+            $statusCode = $e instanceof HttpException
+                ? $e->getStatusCode()
+                : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
+
+            if ($statusCode >= ResponseAlias::HTTP_INTERNAL_SERVER_ERROR) {
+                TelegramHelper::reportToTelegram(
+                    errors: $e,
+                    request: $request,
+                    code: $statusCode
+                );
+            }
         });
     }
 
