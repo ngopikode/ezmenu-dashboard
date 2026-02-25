@@ -23,6 +23,7 @@ class ClientApiController extends Controller
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
+        dd($restaurant);
 
         // Eager load products with their category and options
         $products = $restaurant->products()->with(['category', 'options'])->get();
