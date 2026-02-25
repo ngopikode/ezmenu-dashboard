@@ -22,7 +22,7 @@ class ValidateSubdomain
     public function handle(Request $request, Closure $next): mixed
     {
         $subdomain = $request->route('subdomain');
-        $restaurant = Restaurant::where('subdomain', $subdomain)->first();
+        $restaurant = Restaurant::where('subdomain', $subdomain)->where('is_active', true)->first();
 
         if (!$restaurant) return $this->failResponse(code: ResponseAlias::HTTP_NOT_FOUND, message: 'Restaurant not found or not active.');
 

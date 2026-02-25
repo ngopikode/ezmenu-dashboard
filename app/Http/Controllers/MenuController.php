@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Restaurant;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
@@ -12,23 +13,24 @@ class MenuController extends Controller
     /**
      * Show a product preview for social media bots.
      *
-     * @param string $subdomain
+     * @param Request $request
      * @param int $productId
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function showProductPreview(string $subdomain, int $productId): View
+    public function showProductPreview(Request $request, int $productId): View
     {
-        $restaurant = Restaurant::where('subdomain', $subdomain)->where('is_active', true)->firstOrFail();
+        /** @var Restaurant $restaurant */
+        $restaurant = $request->restaurant;
 
         $product = Product::where('restaurant_id', $restaurant->id)->findOrFail($productId);
 
-        $imageUrl = $product->image ? (config('app.url') . Storage::url($product->image)) : null;
 
         // Menggunakan frontend_url_base dari config
         $reactAppBaseUrl = config('app.frontend_url_base');
 
         $protocol = request()->isSecure() ? 'https' : 'http';
         $fullReactUrl = "{$protocol}://{$restaurant->subdomain}.{$reactAppBaseUrl}";
+        $imageUrl = $product->image ? "$fullReactUrl/" . asset(Storage::url($product->image)) : null;
 
         return view('product_preview', [
             'restaurant' => $restaurant,
