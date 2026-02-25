@@ -21,6 +21,7 @@ class MenuController extends Controller
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
+        dd($productId);
 
         $product = Product::where('restaurant_id', $restaurant->id)->findOrFail($productId);
 
