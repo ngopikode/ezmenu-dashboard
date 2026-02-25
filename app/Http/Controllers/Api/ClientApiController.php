@@ -30,6 +30,7 @@ class ClientApiController extends Controller
         $formattedProducts = $products->map(function ($product) {
             return [
                 'id' => "product-$product->order_column",
+                'product_id' => $product->id,
                 'name' => $product->name,
                 'price' => (float)$product->price,
                 'description' => $product->description,
