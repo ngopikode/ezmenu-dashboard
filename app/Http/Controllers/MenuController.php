@@ -114,9 +114,9 @@ class MenuController extends Controller
         $img->place($mainImage, 'center');
 
         // --- FONT HANDLING ---
-        // Helper function untuk memilih font yang aman
-        $getFont = function($fontName) {
-            $path = public_path("fonts/{$fontName}");
+        // Helper function: Hanya return path jika file font benar-benar ada di folder public/fonts
+        $getFont = function ($fontName) {
+            $path = public_path("fonts/$fontName");
             return file_exists($path) ? $path : null;
         };
 
@@ -127,30 +127,26 @@ class MenuController extends Controller
         // --- TEXT & QR ---
 
         // Nama Produk
-        $img->text($product->name, $canvasWidth / 2, 900, function (FontFactory $font) use ($fontBold) {
-            if ($fontBold) {
+        if ($fontBold) {
+            $img->text($product->name, $canvasWidth / 2, 900, function (FontFactory $font) use ($fontBold) {
                 $font->filename($fontBold);
                 $font->size(50);
-            } else {
-                $font->file(5); // Fallback ke font internal GD terbesar
-            }
-            $font->color('#ffffff');
-            $font->align('center');
-            $font->valign('bottom');
-        });
+                $font->color('#ffffff');
+                $font->align('center');
+                $font->valign('bottom');
+            });
+        }
 
         // Harga
-        $img->text('Rp ' . number_format($product->price, 0, ',', '.'), $canvasWidth / 2, 980, function (FontFactory $font) use ($fontRegular) {
-            if ($fontRegular) {
+        if ($fontRegular) {
+            $img->text('Rp ' . number_format($product->price, 0, ',', '.'), $canvasWidth / 2, 980, function (FontFactory $font) use ($fontRegular) {
                 $font->filename($fontRegular);
                 $font->size(40);
-            } else {
-                $font->file(4);
-            }
-            $font->color('#ffdd00');
-            $font->align('center');
-            $font->valign('bottom');
-        });
+                $font->color('#ffdd00');
+                $font->align('center');
+                $font->valign('bottom');
+            });
+        }
 
         // QR Code
         $reactAppBaseUrl = config('app.frontend_url_base');
@@ -162,30 +158,26 @@ class MenuController extends Controller
         $img->place($qrImage, 'bottom-center', 0, 180);
 
         // Call to Action
-        $img->text('Scan untuk pesan', $canvasWidth / 2, 1150, function (FontFactory $font) use ($fontRegular) {
-            if ($fontRegular) {
+        if ($fontRegular) {
+            $img->text('Scan untuk pesan', $canvasWidth / 2, 1150, function (FontFactory $font) use ($fontRegular) {
                 $font->filename($fontRegular);
                 $font->size(20);
-            } else {
-                $font->file(3);
-            }
-            $font->color('#ffffff');
-            $font->align('center');
-            $font->valign('top');
-        });
+                $font->color('#ffffff');
+                $font->align('center');
+                $font->valign('top');
+            });
+        }
 
         // Nama Restoran
-        $img->text($restaurant->name, $canvasWidth / 2, 1230, function (FontFactory $font) use ($fontLight) {
-            if ($fontLight) {
+        if ($fontLight) {
+            $img->text($restaurant->name, $canvasWidth / 2, 1230, function (FontFactory $font) use ($fontLight) {
                 $font->filename($fontLight);
                 $font->size(24);
-            } else {
-                $font->file(3);
-            }
-            $font->color('#ffffff');
-            $font->align('center');
-            $font->valign('bottom');
-        });
+                $font->color('#ffffff');
+                $font->align('center');
+                $font->valign('bottom');
+            });
+        }
 
         // Simpan ke Cache
         if (!Storage::disk('public')->exists("stories/{$restaurant->id}")) {
