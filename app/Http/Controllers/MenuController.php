@@ -91,6 +91,12 @@ class MenuController extends Controller
         }
 
         $productImagePath = Storage::disk('public')->path($product->image);
+        dd($productImagePath);
+
+        // Cek apakah file gambar produk ada
+        if (!file_exists($productImagePath)) {
+            abort(404, 'Product image not found');
+        }
 
         // Canvas HD (720x1280)
         $canvasWidth = 720;
@@ -114,9 +120,8 @@ class MenuController extends Controller
         $img->place($mainImage, 'center');
 
         // --- FONT HANDLING ---
-        // Helper function: Hanya return path jika file font benar-benar ada di folder public/fonts
         $getFont = function ($fontName) {
-            $path = public_path("fonts/$fontName");
+            $path = public_path("fonts/{$fontName}");
             return file_exists($path) ? $path : null;
         };
 
@@ -124,7 +129,7 @@ class MenuController extends Controller
         $fontRegular = $getFont('Poppins-Regular.ttf');
         $fontLight = $getFont('Poppins-Light.ttf');
 
-        // --- TEXT & QR ---
+        // --- TEXT ---
 
         // Nama Produk
         if ($fontBold) {
@@ -148,14 +153,25 @@ class MenuController extends Controller
             });
         }
 
-        // QR Code
+        // --- QR CODE HANDLING ---
         $reactAppBaseUrl = config('app.frontend_url_base');
         $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl#$productId";
 
-        $qrCode = QrCode::format('png')->size(180)->margin(1)->generate($fullReactUrl);
-        $qrImage = Image::read($qrCode);
-        $img->place($qrImage, 'bottom-center', 0, 180);
+        // Generate QR sebagai string binary PNG
+        $qrCodeString = QrCode::format('png')->size(180)->margin(1)->generate($fullReactUrl);
+
+        // Pastikan input ke Image::read() valid
+        // Kita bisa membungkusnya dalam stream atau langsung string jika library support
+        // Untuk amannya, kita coba baca string langsung. Jika error, mungkin perlu konversi base64 atau stream.
+        try {
+            $qrImage = Image::read($qrCodeString);
+            $img->place($qrImage, 'bottom-center', 0, 180);
+        } catch (\Exception $e) {
+            // Fallback jika gagal baca QR (misal format tidak dikenali)
+            // Log error atau skip QR
+            // \Log::error("QR Code generation failed: " . $e->getMessage());
+        }
 
         // Call to Action
         if ($fontRegular) {
