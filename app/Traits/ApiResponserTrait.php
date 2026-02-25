@@ -5,6 +5,7 @@ namespace App\Traits;
 use App\Helpers\TelegramHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Throwable;
 
@@ -76,6 +77,7 @@ trait ApiResponserTrait
      * @param int $code
      * @param Request|null $request
      * @return JsonResponse
+     * @throws RandomException
      */
     protected function errorResponse(
         mixed   $errors = [],

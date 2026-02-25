@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Typography\FontFactory;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class MenuController extends Controller
@@ -64,82 +65,128 @@ class MenuController extends Controller
 
     public function shareAsStory(Request $request, $subdomain, $productId)
     {
+        // Set time limit sedikit lebih panjang untuk jaga-jaga saat generate pertama kali
+        set_time_limit(60);
+
         $restaurant = $request->restaurant;
         $orderColumn = explode('-', $productId)[1] ?? null;
         $product = Product::where('restaurant_id', $restaurant->id)
             ->where('order_column', $orderColumn)
             ->firstOrFail();
 
-        // Path ke gambar produk
+        // --- CACHING STRATEGY ---
+        // Nama file cache unik berdasarkan ID dan Timestamp update terakhir.
+        // Jika produk diedit, timestamp berubah -> nama file baru -> generate ulang.
+        $cacheFileName = "stories/{$restaurant->id}/{$product->id}_{$product->updated_at->timestamp}.jpg";
+
+        // Cek apakah file cache sudah ada
+        if (Storage::disk('public')->exists($cacheFileName)) {
+            // Jika ada, langsung return file tersebut tanpa proses image processing sama sekali!
+            return response()->file(Storage::disk('public')->path($cacheFileName), [
+                'Content-Type' => 'image/jpeg'
+            ]);
+        }
+
+        // --- JIKA BELUM ADA DI CACHE, GENERATE GAMBAR ---
+
+        // Hapus cache lama untuk produk ini agar tidak menumpuk sampah file
+        $oldFiles = Storage::disk('public')->files("stories/{$restaurant->id}");
+        foreach ($oldFiles as $file) {
+            if (str_contains($file, "{$product->id}_")) {
+                Storage::disk('public')->delete($file);
+            }
+        }
+
+        // Path ke gambar produk asli
         $productImagePath = Storage::disk('public')->path($product->image);
 
-        // Buat canvas utama (Intervention Image v3)
-        $img = Image::create(1080, 1920)->fill('#ffffff');
+        // Gunakan resolusi HD (720x1280) bukan Full HD untuk hemat CPU & RAM
+        $canvasWidth = 720;
+        $canvasHeight = 1280;
 
-        // Tambahkan gambar produk sebagai background
+        $img = Image::create($canvasWidth, $canvasHeight)->fill('#ffffff');
+
+        // --- BACKGROUND (Fake Blur Technique) ---
+        // Resize sangat kecil (36x64 px) lalu resize besar lagi.
+        // Ini menciptakan efek blur alami tanpa kalkulasi Gaussian Blur yang berat.
         $backgroundImage = Image::read($productImagePath);
-        $backgroundImage->cover(1080, 1920);
-        $backgroundImage->blur(50);
+        $backgroundImage->cover(36, 64);
+        $backgroundImage->resize($canvasWidth, $canvasHeight);
 
-        // Gelapkan background dengan overlay hitam transparan
-        $overlay = Image::create(1080, 1920)->fill('rgba(0, 0, 0, 0.3)');
+        // Overlay gelap (hemat CPU dibanding brightness adjustment)
+        $overlay = Image::create($canvasWidth, $canvasHeight)->fill('rgba(0, 0, 0, 0.35)');
         $backgroundImage->place($overlay);
 
         $img->place($backgroundImage);
 
-        // Tambahkan gambar produk utama di tengah
+        // --- MAIN IMAGE ---
         $mainImage = Image::read($productImagePath);
-        $mainImage->scale(width: 800);
+        // Resize ke lebar 550px (cukup tajam untuk layar HP)
+        $mainImage->scale(width: 550);
         $img->place($mainImage, 'center');
 
-        // Tambahkan Nama Produk
-        $img->text($product->name, 540, 1350, function ($font) {
-            $font->file(public_path('fonts/Poppins-Bold.ttf'));
-            $font->size(80);
+        // --- TEXT & QR (Koordinat disesuaikan untuk 720x1280) ---
+
+        // Nama Produk
+        $img->text($product->name, $canvasWidth / 2, 900, function (FontFactory $font) {
+            $font->filename(public_path('fonts/Poppins-Bold.ttf'));
+            $font->size(50); // Font size disesuaikan
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('bottom');
         });
 
-        // Tambahkan Harga
-        $img->text('Rp ' . number_format($product->price, 0, ',', '.'), 540, 1450, function ($font) {
-            $font->file(public_path('fonts/Poppins-Regular.ttf'));
-            $font->size(60);
+        // Harga
+        $img->text('Rp ' . number_format($product->price, 0, ',', '.'), $canvasWidth / 2, 980, function (FontFactory $font) {
+            $font->filename(public_path('fonts/Poppins-Regular.ttf'));
+            $font->size(40);
             $font->color('#ffdd00');
             $font->align('center');
             $font->valign('bottom');
         });
 
-        // Generate URL Produk
+        // QR Code
         $reactAppBaseUrl = config('app.frontend_url_base');
         $protocol = $request->isSecure() ? 'https' : 'http';
         $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl#$productId";
 
-        // Tambahkan QR Code
-        $qrCode = QrCode::format('png')->size(250)->margin(1)->generate($fullReactUrl);
+        // Generate QR (Ukuran lebih kecil: 180px)
+        $qrCode = QrCode::format('png')->size(180)->margin(1)->generate($fullReactUrl);
         $qrImage = Image::read($qrCode);
 
-        // Insert QR Code di bagian bawah
-        $img->place($qrImage, 'bottom-center', 0, 250);
+        // Posisi QR (offset 180 dari bawah)
+        $img->place($qrImage, 'bottom-center', 0, 180);
 
-        // Tambahkan Call to Action Text di bawah QR Code
-        $img->text('Scan untuk pesan', 540, 1720, function ($font) {
-            $font->file(public_path('fonts/Poppins-Regular.ttf'));
-            $font->size(30);
+        // Call to Action
+        $img->text('Scan untuk pesan', $canvasWidth / 2, 1150, function (FontFactory $font) {
+            $font->filename(public_path('fonts/Poppins-Regular.ttf'));
+            $font->size(20);
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('top');
         });
 
-        // Tambahkan Nama Restoran di paling bawah
-        $img->text($restaurant->name, 540, 1850, function ($font) {
-            $font->file(public_path('fonts/Poppins-Light.ttf'));
-            $font->size(40);
+        // Nama Restoran
+        $img->text($restaurant->name, $canvasWidth / 2, 1230, function (FontFactory $font) {
+            $font->filename(public_path('fonts/Poppins-Light.ttf'));
+            $font->size(24);
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('bottom');
         });
 
-        return response($img->toJpeg(), 200, ['Content-Type' => 'image/jpeg']);
+        // Simpan ke Cache
+        // Pastikan direktori ada
+        if (!Storage::disk('public')->exists("stories/{$restaurant->id}")) {
+            Storage::disk('public')->makeDirectory("stories/{$restaurant->id}");
+        }
+
+        // Save kualitas 80% (cukup bagus, file size kecil)
+        $img->save(Storage::disk('public')->path($cacheFileName), 80);
+
+        // Return file yang baru saja dibuat
+        return response()->file(Storage::disk('public')->path($cacheFileName), [
+            'Content-Type' => 'image/jpeg'
+        ]);
     }
 }
