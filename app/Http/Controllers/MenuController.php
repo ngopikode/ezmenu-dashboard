@@ -91,7 +91,6 @@ class MenuController extends Controller
         }
 
         $productImagePath = Storage::disk('public')->path($product->image);
-        dd($productImagePath);
 
         // Cek apakah file gambar produk ada
         if (!file_exists($productImagePath)) {
