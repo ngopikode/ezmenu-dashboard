@@ -26,7 +26,9 @@ class ValidateSubdomain
 
         if (!$restaurant) return $this->failResponse(code: ResponseAlias::HTTP_NOT_FOUND, message: 'Restaurant not found or not active.');
 
-        $request->attributes->add(['restaurant' => $restaurant]);
+        // Use merge to make it available via $request->input('restaurant') and $request->restaurant
+        $request->merge(['restaurant' => $restaurant]);
+
         return $next($request);
     }
 }

@@ -22,8 +22,7 @@ class ClientApiController extends Controller
     public function __invoke(Request $request): JsonResponse
     {
         /** @var Restaurant $restaurant */
-        $restaurant = $request->attributes->get('restaurant');
-        dd($restaurant);
+        $restaurant = $request->restaurant;
 
         // Eager load products with their category and options
         $products = $restaurant->products()->with(['category', 'options'])->get();
