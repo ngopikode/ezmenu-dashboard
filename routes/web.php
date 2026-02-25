@@ -16,32 +16,36 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// --- Rute untuk Rich Preview ---
-// Ini akan menangani domain seperti: samarotikukus.ngopikode.my.id/menu/1
-Route::domain('{subdomain}.' . config('app.frontend_url_base'))->group(function () {
-    Route::get('/menu/{productId}', [MenuController::class, 'showProductPreview'])
-        ->where('productId', '[0-9]+')
-        ->name('product.preview');
-});
-
 Route::view('/', 'welcome')->name('welcome');
 
-// --- Rute untuk Dashboard Admin ---
-// Ini akan menangani domain utama: restaurant.ngopikode.com
-Route::middleware('auth:web')->group(function () {
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
+// --- Rute untuk Dashboard Admin dan Rich Preview ---
+// Ini akan menangani domain seperti: subdomain.ngopikode.my.id
+Route::domain('{subdomain}.' . config('app.frontend_url_base'))
+    ->middleware('validateSubdomain')
+    ->group(function () {
+        // --- Rute untuk Rich Preview ---
+        // Ini akan menangani URL seperti: /menu/1
+        Route::get('/menu/{productId}', [MenuController::class, 'showProductPreview'])
+            ->where('productId', '[0-9]+')
+            ->name('product.preview');
 
-    // Menu Management
-    Route::get('/menu', Index::class)->name('menu.index');
+        // --- Rute untuk Dashboard Admin ---
+        Route::middleware('auth:web')->group(function () {
+            Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-    // Order Management
-    Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
+            // Menu Management
+            Route::get('/menu', Index::class)->name('menu.index');
 
-    // Settings
-    Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
+            // Order Management
+            Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
 
-    // Profile
-    Route::view('profile', 'profile')->name('profile');
-});
+            // Settings
+            Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
 
-require __DIR__ . '/auth.php';
+            // Profile
+            Route::view('profile', 'profile')->name('profile');
+        });
+
+        // Include auth routes within the subdomain group
+        require __DIR__ . '/auth.php';
+    });
