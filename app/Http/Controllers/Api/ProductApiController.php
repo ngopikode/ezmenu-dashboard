@@ -77,7 +77,7 @@ class ProductApiController extends Controller
         );
     }
 
-    public function show(Request $request, string $productId): JsonResponse
+    public function show(Request $request, string $subdomain, string $productId): JsonResponse
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
