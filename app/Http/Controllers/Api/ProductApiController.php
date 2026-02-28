@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
 use App\Models\Restaurant;
 use App\Traits\ApiPaginationTrait;
 use App\Traits\ApiResponserTrait;
@@ -70,8 +69,12 @@ class ProductApiController extends Controller
         );
     }
 
-    public function show(Request $request, Product $product): JsonResponse
+    public function show(Request $request, string $productId): JsonResponse
     {
+        /** @var Restaurant $restaurant */
+        $restaurant = $request->restaurant;
+        $product = $restaurant->products()->where('order_column', $productId)->first();
+
         $transformedData = [
             'id' => "product-$product->order_column",
             'product_id' => $product->id,

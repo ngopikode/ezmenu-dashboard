@@ -30,7 +30,7 @@ Route::domain("{subdomain}.$frontEndUrlBase")->middleware('validateSubdomain')->
     Route::get('/restaurant', RestaurantApiController::class);
     Route::get('/categories', CategoryApiController::class);
     Route::get('/products', [ProductApiController::class, 'index']);
-    Route::get('/products/{product}', [ProductApiController::class, 'show']);
+    Route::get('/products/{productId}', [ProductApiController::class, 'show']);
 
     Route::post('/orders', [OrderApiController::class, 'store'])
         ->middleware('throttle:orders');
