@@ -134,6 +134,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         // 6. Loop dan masukkan setiap produk beserta opsinya
+        $orderColumn = 1;
         foreach ($menuData as $item) {
             $product = Product::create([
                 'restaurant_id' => $restaurant->id,
@@ -143,6 +144,7 @@ class DatabaseSeeder extends Seeder
                 'price' => $item['price'],
                 'image' => $item['img'],
                 'type' => $item['type'],
+                'order_column' => $orderColumn++,
                 'is_available' => true,
             ]);
 

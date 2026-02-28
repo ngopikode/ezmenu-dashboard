@@ -170,6 +170,7 @@ class MartabakHeningSeeder extends Seeder
         ];
 
         // 5. Loop Insert Produk
+        $orderColumn = 1;
         foreach ($menuData as $item) {
             $product = Product::create([
                 'restaurant_id' => $restaurant->id,
@@ -179,6 +180,7 @@ class MartabakHeningSeeder extends Seeder
                 'price' => $item['price'],
                 'image' => $item['img'],
                 'type' => $item['type'],
+                'order_column' => $orderColumn++,
                 'is_available' => true,
             ]);
 
