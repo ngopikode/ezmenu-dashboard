@@ -18,17 +18,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('welcome');
 
-Route::get('/debug-url', function () {
-    dd(
-        request()->getHost(),
-        request()->getScheme(),
-        request()->isSecure(),
-        config('app.url'),
-        url('/'),
-        asset('test.png')
-    );
-});
-
 // --- Rute untuk Dashboard Admin dan Rich Preview ---
 // Ini akan menangani domain seperti: subdomain.ngopikode.my.id
 Route::domain('{subdomain}.' . config('app.frontend_url_base'))
@@ -49,6 +38,18 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))
 Route::prefix('dashboard')->group(function () {
     Route::middleware('auth:web')
         ->group(function () {
+
+            Route::get('/debug-url', function () {
+                dd(
+                    request()->getHost(),
+                    request()->getScheme(),
+                    request()->isSecure(),
+                    config('app.url'),
+                    url('/'),
+                    asset('test.png')
+                );
+            });
+
             Route::get('/', Dashboard::class)->name('dashboard');
 
             // Menu Management
