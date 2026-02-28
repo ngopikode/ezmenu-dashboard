@@ -36,20 +36,21 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))
 
 // --- Rute untuk Dashboard Admin ---
 Route::prefix('dashboard')->group(function () {
+
+    Route::get('/debug-url', function () {
+        dd(
+            request()->getHost(),
+            request()->getScheme(),
+            request()->isSecure(),
+            config('app.url'),
+            url('/'),
+            asset('test.png')
+        );
+    });
+
     Route::middleware('auth:web')
         ->group(function () {
-
-            Route::get('/debug-url', function () {
-                dd(
-                    request()->getHost(),
-                    request()->getScheme(),
-                    request()->isSecure(),
-                    config('app.url'),
-                    url('/'),
-                    asset('test.png')
-                );
-            });
-
+            // Dashboard
             Route::get('/', Dashboard::class)->name('dashboard');
 
             // Menu Management
