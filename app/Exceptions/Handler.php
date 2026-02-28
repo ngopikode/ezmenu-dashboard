@@ -8,6 +8,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -48,7 +49,7 @@ class Handler extends ExceptionHandler
 
             $statusCode = $e instanceof HttpException
                 ? $e->getStatusCode()
-                : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
+                : null;
 
             if ($statusCode >= ResponseAlias::HTTP_INTERNAL_SERVER_ERROR) {
                 TelegramHelper::reportToTelegram(
@@ -66,6 +67,7 @@ class Handler extends ExceptionHandler
      * @param Throwable $e
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws RandomException
      */
     private function handleApiException(Throwable $e, Request $request)
     {
