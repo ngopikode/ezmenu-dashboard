@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\TenantUrl;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class RestaurantApiController extends Controller
 {
@@ -27,7 +27,7 @@ class RestaurantApiController extends Controller
         $data = [
             'id' => $restaurant->id,
             'name' => $restaurant->name,
-            'logo' => $restaurant->logo ? asset(Storage::url($restaurant->logo)) : null,
+            'logo' => $restaurant->logo ? TenantUrl::asset($restaurant->logo) : null,
             'theme_color' => $restaurant->theme_color,
             'whatsapp_number' => $restaurant->whatsapp_number,
             'address' => $restaurant->address,
@@ -49,7 +49,7 @@ class RestaurantApiController extends Controller
                 'keywords' => $restaurant->seo_keywords,
                 'og_title' => $restaurant->og_title,
                 'og_description' => $restaurant->og_description,
-                'og_image' => $restaurant->og_image ? asset(Storage::url($restaurant->og_image)) : null,
+                'og_image' => $restaurant->og_image ? TenantUrl::asset($restaurant->og_image) : null
             ]
         ];
 

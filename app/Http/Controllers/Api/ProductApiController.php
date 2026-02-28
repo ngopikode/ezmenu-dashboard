@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\TenantUrl;
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Services\Product\ProductService;
@@ -9,7 +10,6 @@ use App\Traits\ApiPaginationTrait;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ProductApiController extends Controller
 {
@@ -62,7 +62,7 @@ class ProductApiController extends Controller
                 'price' => (float)$product->price,
                 'description' => $product->description,
                 'category' => $product->category->name,
-                'image' => $product->image ? asset(Storage::url($product->image)) : null,
+                'image' => $product->image ? TenantUrl::asset($product->image) : null,
                 'type' => $product->type,
                 'options' => $product->options->pluck('name'),
             ];
@@ -90,7 +90,7 @@ class ProductApiController extends Controller
             'price' => (float)$product->price,
             'description' => $product->description,
             'category' => $product->category->name,
-            'image' => $product->image ? asset(Storage::url($product->image)) : null,
+            'image' => $product->image ? TenantUrl::asset($product->image) : null,
             'type' => $product->type,
             'options' => $product->options->pluck('name'),
         ];
