@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,15 +22,15 @@ class AppServiceProvider extends ServiceProvider
     {
         Paginator::useBootstrapFive();
 
-        if (!$this->app->environment('local')) {
-            URL::forceScheme('https');
-        }
+        if (!app()->runningInConsole() && app()->environment('production')) {
 
-        if (!app()->runningInConsole()) {
-            config([
-                'app.url' => (app()->environment('local') ? 'http' : 'https')
-                    . '://' . request()->getHost()
-            ]);
+            $host = request()->getHost();
+            $url = "https://$host";
+
+            config(['app.url' => $url]);
+
+            app('url')->forceRootUrl($url);
+            app('url')->forceScheme('https');
         }
     }
 }
