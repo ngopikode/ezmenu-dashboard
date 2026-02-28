@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,17 +22,13 @@ class AppServiceProvider extends ServiceProvider
     {
         if (!app()->runningInConsole()) {
 
-            $host = request()->getHost();
+            $request = request();
 
-            if (app()->environment('production')) {
-                $url = "https://{$host}";
-                app('url')->forceScheme('https');
-            } else {
-                $url = request()->getSchemeAndHttpHost();
+            URL::forceRootUrl($request->getSchemeAndHttpHost());
+
+            if ($request->isSecure()) {
+                URL::forceScheme('https');
             }
-
-            config(['app.url' => $url]);
-            app('url')->forceRootUrl($url);
         }
     }
 }
