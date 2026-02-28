@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
+use App\Services\Product\ProductService;
 use App\Traits\ApiPaginationTrait;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +14,13 @@ use Illuminate\Support\Facades\Storage;
 class ProductApiController extends Controller
 {
     use ApiResponserTrait, ApiPaginationTrait;
+
+    protected ?ProductService $productService = null;
+
+    protected function productService()
+    {
+        return $this->productService ??= app(ProductService::class);
+    }
 
     /**
      * Handle the incoming request.
@@ -73,7 +81,7 @@ class ProductApiController extends Controller
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
-        $product = $restaurant->products()->where('order_column', $productId)->first();
+        $product = $this->productService()->getProduct($restaurant, $productId);
 
         $transformedData = [
             'id' => "product-$product->order_column",

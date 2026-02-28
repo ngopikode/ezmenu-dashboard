@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Restaurant;
+use App\Services\Product\ProductService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -18,6 +19,15 @@ use Intervention\Image\Typography\FontFactory;
 class MenuController extends Controller
 {
     /**
+     * Constructor.
+     */
+    public function __construct(
+        protected ProductService $productService
+    )
+    {
+    }
+
+    /**
      * Show a product preview for social media bots.
      *
      * @param Request $request
@@ -29,14 +39,14 @@ class MenuController extends Controller
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
-        $product = $this->getProduct($restaurant, $productId);
+        $product = $this->productService->getProduct($restaurant, $productId);
         $fullReactUrl = $this->getReactAppUrl($request, $subdomain);
 
         if ($this->isSocialMediaBot($request)) {
             return view('product_preview', [
                 'restaurant' => $restaurant,
                 'product' => $product,
-                'image_url' => $this->getProductImageUrl($product),
+                'image_url' => $this->productService->getProductImageUrl($product),
                 'react_app_url' => $fullReactUrl,
             ]);
         }
@@ -50,7 +60,7 @@ class MenuController extends Controller
     public function shareAsStory(Request $request, $subdomain, $productId)
     {
         $restaurant = $request->restaurant;
-        $product = $this->getProduct($restaurant, $productId);
+        $product = $this->productService->getProduct($restaurant, $productId);
 
         $fullReactUrl = $this->getReactAppUrl($request, $subdomain);
         $productUrl = "$fullReactUrl/menu/$productId";
@@ -58,7 +68,7 @@ class MenuController extends Controller
         return view('story_preview', [
             'restaurant' => $restaurant,
             'product' => $product,
-            'image_url' => $this->getProductImageUrl($product),
+            'image_url' => $this->productService->getProductImageUrl($product),
             'product_url' => $productUrl,
             'share_text' => $this->generateShareText($product, $restaurant),
             'share_title' => "$product->name - $restaurant->name"
@@ -73,7 +83,7 @@ class MenuController extends Controller
         set_time_limit(60);
 
         $restaurant = $request->restaurant;
-        $product = $this->getProduct($restaurant, $productId);
+        $product = $this->productService->getProduct($restaurant, $productId);
 
         // --- CACHING STRATEGY ---
         $cacheFileName = "stories/$subdomain/{$product->id}_{$product->updated_at->timestamp}.jpg";
@@ -94,18 +104,6 @@ class MenuController extends Controller
         $this->createStoryImage($product, $restaurant, $productImagePath, $cacheFileName);
 
         return $this->downloadStoryImage($cacheFileName, $downloadName);
-    }
-
-    /**
-     * Retrieve product based on restaurant and product ID format.
-     */
-    private function getProduct(Restaurant $restaurant, string $productId): Product
-    {
-        $orderColumn = explode('-', $productId)[1] ?? null;
-
-        return Product::where('restaurant_id', $restaurant->id)
-            ->where('order_column', $orderColumn)
-            ->firstOrFail();
     }
 
     /**
@@ -132,14 +130,6 @@ class MenuController extends Controller
             }
         }
         return false;
-    }
-
-    /**
-     * Get the full URL of the product image.
-     */
-    private function getProductImageUrl(Product $product): ?string
-    {
-        return $product->image ? asset(Storage::url($product->image)) : null;
     }
 
     /**
