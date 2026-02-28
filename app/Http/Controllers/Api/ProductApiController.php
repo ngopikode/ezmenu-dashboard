@@ -73,7 +73,7 @@ class ProductApiController extends Controller
 
         return $this->successResponse(
             data: $data,
-            headers: ['Cache-Control', 'public, max-age=3600']
+            headers: ['Cache-Control', 'private, max-age=3600']
         );
     }
 
@@ -97,7 +97,7 @@ class ProductApiController extends Controller
 
         return $this->successResponse(
             data: $transformedData,
-            headers: ['Cache-Control', 'public, max-age=3600']
+            headers: ['Cache-Control', 'private, max-age=3600']
         );
     }
 }
