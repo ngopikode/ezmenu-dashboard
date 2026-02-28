@@ -155,7 +155,7 @@ class extends Component {
             <div class="text-center">
                 <p class="text-muted small mb-0">
                     New to EzMenu Enterprise?
-                    <a href="{{ route('register', ['subdomain' => request()->route('subdomain')]) }}"
+                    <a href="{{ route('register') }}"
                        class="text-primary fw-semibold text-decoration-none"
                        wire:navigate>
                         Register Outlet

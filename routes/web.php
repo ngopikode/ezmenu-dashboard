@@ -32,28 +32,28 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))
 
         // Generate Gambar Story (JPEG)
         Route::get('/menu/{productId}/story/image', [MenuController::class, 'generateStoryImage'])->name('product.story.image');
-
-        // --- Rute untuk Dashboard Admin ---
-        Route::prefix('dashboard')->group(function () {
-            Route::middleware('auth:web')
-                ->group(function () {
-                    Route::get('/', Dashboard::class)->name('dashboard');
-
-                    // Menu Management
-                    Route::get('menu', MenuIndex::class)->name('menu.index');
-
-                    // Order Management
-                    Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
-
-                    // Settings
-                    Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
-
-                    // Profile
-                    Route::view('profile', 'profile')->name('profile');
-
-                    // Include auth routes within the subdomain group
-                });
-
-            require __DIR__ . '/auth.php';
-        });
     });
+
+// --- Rute untuk Dashboard Admin ---
+Route::prefix('dashboard')->group(function () {
+    Route::middleware('auth:web')
+        ->group(function () {
+            Route::get('/', Dashboard::class)->name('dashboard');
+
+            // Menu Management
+            Route::get('menu', MenuIndex::class)->name('menu.index');
+
+            // Order Management
+            Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
+
+            // Settings
+            Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
+
+            // Profile
+            Route::view('profile', 'profile')->name('profile');
+
+            // Include auth routes within the subdomain group
+        });
+
+    require __DIR__ . '/auth.php';
+});

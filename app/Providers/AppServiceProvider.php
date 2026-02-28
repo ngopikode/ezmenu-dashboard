@@ -32,9 +32,5 @@ class AppServiceProvider extends ServiceProvider
             $url = request()->getSchemeAndHttpHost();
             config(['app.url' => $url]);
         }
-
-        if ($subdomain = request()->route('subdomain')) {
-            URL::defaults(['subdomain' => $subdomain]);
-        }
     }
 }
