@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\ClientApiController;
 use App\Http\Controllers\Api\OrderApiController;
+use App\Http\Controllers\Api\ProductApiController;
+use App\Http\Controllers\Api\RestaurantApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,7 +26,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 $frontEndUrlBase = config('app.frontend_url_base');
 Route::domain("{subdomain}.$frontEndUrlBase")->middleware('validateSubdomain')->group(function () {
-    Route::get('/client', ClientApiController::class);
+    // Route::get('/client', ClientApiController::class); // Deprecated/Removed
+
+    Route::get('/restaurant', RestaurantApiController::class);
+    Route::get('/categories', CategoryApiController::class);
+    Route::get('/products', ProductApiController::class);
 
     Route::post('/orders', [OrderApiController::class, 'store'])
         ->middleware('throttle:orders');
