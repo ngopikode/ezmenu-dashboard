@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Restaurant;
 use App\Traits\ApiPaginationTrait;
 use App\Traits\ApiResponserTrait;
@@ -20,13 +21,13 @@ class ProductApiController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function __invoke(Request $request): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
 
         // Ambil parameter limit, default 20, cast ke integer
-        $limit = (int) $request->input('limit', 20);
+        $limit = (int)$request->input('limit', 20);
 
         // Ambil parameter category, default 'all'
         $categoryName = $request->input('category', 'all');
@@ -63,6 +64,29 @@ class ProductApiController extends Controller
         // Wrap with pagination metadata using ApiPaginationTrait
         $data = self::autoPaginateWrapperV2($products, $transformedData);
 
-        return $this->successResponse($data);
+        return $this->successResponse(
+            data: $data,
+            headers: ['Cache-Control', 'public, max-age=3600']
+        );
+    }
+
+    public function show(Request $request, Product $product): JsonResponse
+    {
+        $transformedData = [
+            'id' => "product-$product->order_column",
+            'product_id' => $product->id,
+            'name' => $product->name,
+            'price' => (float)$product->price,
+            'description' => $product->description,
+            'category' => $product->category->name,
+            'image' => $product->image ? asset(Storage::url($product->image)) : null,
+            'type' => $product->type,
+            'options' => $product->options->pluck('name'),
+        ];
+
+        return $this->successResponse(
+            data: $transformedData,
+            headers: ['Cache-Control', 'public, max-age=3600']
+        );
     }
 }
