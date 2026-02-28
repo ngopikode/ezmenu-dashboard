@@ -29,57 +29,124 @@ class MenuController extends Controller
     {
         /** @var Restaurant $restaurant */
         $restaurant = $request->restaurant;
+        $product = $this->getProduct($restaurant, $productId);
+        $fullReactUrl = $this->getReactAppUrl($request, $subdomain);
 
-        $orderColumn = explode('-', $productId)[1] ?? null;
-        $product = Product::where('restaurant_id', $restaurant->id)
-            ->where('order_column', $orderColumn)
-            ->firstOrFail();
-
-        // Menggunakan frontend_url_base dari config
-        $reactAppBaseUrl = config('app.frontend_url_base');
-
-        $protocol = $request->isSecure() ? 'https' : 'http';
-        $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl";
-
-        $userAgent = strtolower(request()->header('User-Agent'));
-        if (
-            str_contains($userAgent, 'whatsapp') ||
-            str_contains($userAgent, 'facebookexternalhit') ||
-            str_contains($userAgent, 'facebot') ||
-            str_contains($userAgent, 'twitterbot') ||
-            str_contains($userAgent, 'linkedinbot')
-        ) {
-            $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
-
+        if ($this->isSocialMediaBot($request)) {
             return view('product_preview', [
                 'restaurant' => $restaurant,
                 'product' => $product,
-                'image_url' => $imageUrl,
+                'image_url' => $this->getProductImageUrl($product),
                 'react_app_url' => $fullReactUrl,
             ]);
-
         }
 
         return redirect("$fullReactUrl#$productId");
     }
 
-    // Menampilkan halaman preview story (HTML)
+    /**
+     * Menampilkan halaman preview story (HTML)
+     */
     public function shareAsStory(Request $request, $subdomain, $productId)
     {
         $restaurant = $request->restaurant;
-        $orderColumn = explode('-', $productId)[1] ?? null;
-        $product = Product::where('restaurant_id', $restaurant->id)
-            ->where('order_column', $orderColumn)
-            ->firstOrFail();
+        $product = $this->getProduct($restaurant, $productId);
 
-        $reactAppBaseUrl = config('app.frontend_url_base');
-        $protocol = $request->isSecure() ? 'https' : 'http';
-        $fullReactUrl = "$protocol://$subdomain.$reactAppBaseUrl";
+        $fullReactUrl = $this->getReactAppUrl($request, $subdomain);
         $productUrl = "$fullReactUrl/menu/$productId";
 
-        $imageUrl = $product->image ? asset(Storage::url($product->image)) : null;
+        return view('story_preview', [
+            'restaurant' => $restaurant,
+            'product' => $product,
+            'image_url' => $this->getProductImageUrl($product),
+            'product_url' => $productUrl,
+            'share_text' => $this->generateShareText($product, $restaurant),
+            'share_title' => "{$product->name} - {$restaurant->name}"
+        ]);
+    }
 
-        // --- LOGIKA WORDING DI SINI ---
+    /**
+     * Men-generate gambar story (JPEG)
+     */
+    public function generateStoryImage(Request $request, $subdomain, $productId)
+    {
+        set_time_limit(60);
+
+        $restaurant = $request->restaurant;
+        $product = $this->getProduct($restaurant, $productId);
+
+        // --- CACHING STRATEGY ---
+        $cacheFileName = "stories/{$restaurant->id}/{$product->id}_{$product->updated_at->timestamp}.jpg";
+        $downloadName = Str::slug($product->name) . '-story.jpg';
+
+        if (Storage::disk('public')->exists($cacheFileName)) {
+            return $this->downloadStoryImage($cacheFileName, $downloadName);
+        }
+
+        $this->clearOldStoryCache($restaurant->id, $product->id);
+
+        $productImagePath = Storage::disk('public')->path($product->image);
+
+        if (!file_exists($productImagePath)) {
+            abort(404, 'Product image not found');
+        }
+
+        $this->createStoryImage($product, $restaurant, $productImagePath, $cacheFileName);
+
+        return $this->downloadStoryImage($cacheFileName, $downloadName);
+    }
+
+    /**
+     * Retrieve product based on restaurant and product ID format.
+     */
+    private function getProduct(Restaurant $restaurant, string $productId): Product
+    {
+        $orderColumn = explode('-', $productId)[1] ?? null;
+
+        return Product::where('restaurant_id', $restaurant->id)
+            ->where('order_column', $orderColumn)
+            ->firstOrFail();
+    }
+
+    /**
+     * Construct the React App Base URL.
+     */
+    private function getReactAppUrl(Request $request, string $subdomain): string
+    {
+        $reactAppBaseUrl = config('app.frontend_url_base');
+        $protocol = $request->isSecure() ? 'https' : 'http';
+        return "$protocol://$subdomain.$reactAppBaseUrl";
+    }
+
+    /**
+     * Check if the request comes from a social media bot.
+     */
+    private function isSocialMediaBot(Request $request): bool
+    {
+        $userAgent = strtolower($request->header('User-Agent'));
+        $bots = ['whatsapp', 'facebookexternalhit', 'facebot', 'twitterbot', 'linkedinbot'];
+
+        foreach ($bots as $bot) {
+            if (str_contains($userAgent, $bot)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the full URL of the product image.
+     */
+    private function getProductImageUrl(Product $product): ?string
+    {
+        return $product->image ? asset(Storage::url($product->image)) : null;
+    }
+
+    /**
+     * Generate the sharing text for the story.
+     */
+    private function generateShareText(Product $product, Restaurant $restaurant): string
+    {
         $generalHooks = [
             '✨ *Barangkali lagi kepikiran ini...*',
             '🌟 *Salah satu yang paling sering dicari nih,*',
@@ -94,61 +161,52 @@ class MenuController extends Controller
 
         $shareText = "{$randomHook}\n\n";
         $shareText .= "*{$product->name}* @ *{$restaurant->name}*\n";
+
         if ($product->description) {
             $shareText .= "_\"{$product->description}\"_\n\n";
         } else {
             $shareText .= "\n";
         }
+
         $shareText .= "Harganya cuma *{$priceFormatted}* aja lho. ✨\n\n";
         $shareText .= "Cek selengkapnya atau langsung order di sini ya:\n";
 
-        return view('story_preview', [
-            'restaurant' => $restaurant,
-            'product' => $product,
-            'image_url' => $imageUrl,
-            'product_url' => $productUrl,
-            'share_text' => $shareText, // Kirim teks yang sudah jadi ke view
-            'share_title' => "{$product->name} - {$restaurant->name}"
-        ]);
+        return $shareText;
     }
 
-    // Men-generate gambar story (JPEG)
-    public function generateStoryImage(Request $request, $subdomain, $productId)
+    /**
+     * Clear old cached story images for the product.
+     */
+    private function clearOldStoryCache(int $restaurantId, int $productId): void
     {
-        set_time_limit(60);
-
-        $restaurant = $request->restaurant;
-        $orderColumn = explode('-', $productId)[1] ?? null;
-        $product = Product::where('restaurant_id', $restaurant->id)
-            ->where('order_column', $orderColumn)
-            ->firstOrFail();
-
-        // --- CACHING STRATEGY ---
-        $cacheFileName = "stories/{$restaurant->id}/{$product->id}_{$product->updated_at->timestamp}.jpg";
-
-        // Nama file download yang cantik (slugified)
-        $downloadName = Str::slug($product->name) . '-story.jpg';
-
-        if (Storage::disk('public')->exists($cacheFileName)) {
-            return response()->download(Storage::disk('public')->path($cacheFileName), $downloadName, [
-                'Content-Type' => 'image/jpeg'
-            ]);
+        $directory = "stories/{$restaurantId}";
+        if (!Storage::disk('public')->exists($directory)) {
+            return;
         }
 
-        // Hapus cache lama
-        $oldFiles = Storage::disk('public')->files("stories/{$restaurant->id}");
+        $oldFiles = Storage::disk('public')->files($directory);
         foreach ($oldFiles as $file) {
-            if (str_contains($file, "{$product->id}_")) {
+            if (Str::startsWith(basename($file), "{$productId}_")) {
                 Storage::disk('public')->delete($file);
             }
         }
+    }
 
-        $productImagePath = Storage::disk('public')->path($product->image);
+    /**
+     * Return a download response for the story image.
+     */
+    private function downloadStoryImage(string $filePath, string $downloadName)
+    {
+        return response()->download(Storage::disk('public')->path($filePath), $downloadName, [
+            'Content-Type' => 'image/jpeg'
+        ]);
+    }
 
-        if (!file_exists($productImagePath)) {
-            abort(404, 'Product image not found');
-        }
-
+    /**
+     * Create and save the story image.
+     */
+    private function createStoryImage(Product $product, Restaurant $restaurant, string $sourceImagePath, string $destCachePath): void
+    {
         // Canvas HD (720x1280)
         $canvasWidth = 720;
         $canvasHeight = 1280;
@@ -156,7 +214,7 @@ class MenuController extends Controller
         $img = Image::create($canvasWidth, $canvasHeight)->fill('#ffffff');
 
         // --- BACKGROUND (Fake Blur) ---
-        $backgroundImage = Image::read($productImagePath);
+        $backgroundImage = Image::read($sourceImagePath);
         $backgroundImage->cover(36, 64);
         $backgroundImage->resize($canvasWidth, $canvasHeight);
 
@@ -166,19 +224,14 @@ class MenuController extends Controller
         $img->place($backgroundImage);
 
         // --- MAIN IMAGE ---
-        $mainImage = Image::read($productImagePath);
+        $mainImage = Image::read($sourceImagePath);
         $mainImage->scale(width: 550);
         $img->place($mainImage, 'center');
 
         // --- FONT HANDLING ---
-        $getFont = function ($fontName) {
-            $path = public_path("fonts/{$fontName}");
-            return file_exists($path) ? $path : null;
-        };
-
-        $fontBold = $getFont('Poppins-Bold.ttf');
-        $fontRegular = $getFont('Poppins-Regular.ttf');
-        $fontLight = $getFont('Poppins-Light.ttf');
+        $fontBold = $this->getFontPath('Poppins-Bold.ttf');
+        $fontRegular = $this->getFontPath('Poppins-Regular.ttf');
+        $fontLight = $this->getFontPath('Poppins-Light.ttf');
 
         // --- TEXT ---
 
@@ -227,14 +280,20 @@ class MenuController extends Controller
         }
 
         // Simpan ke Cache
-        if (!Storage::disk('public')->exists("stories/{$restaurant->id}")) {
-            Storage::disk('public')->makeDirectory("stories/{$restaurant->id}");
+        $directory = dirname($destCachePath);
+        if (!Storage::disk('public')->exists($directory)) {
+            Storage::disk('public')->makeDirectory($directory);
         }
 
-        $img->save(Storage::disk('public')->path($cacheFileName), 80);
+        $img->save(Storage::disk('public')->path($destCachePath), 80);
+    }
 
-        return response()->download(Storage::disk('public')->path($cacheFileName), $downloadName, [
-            'Content-Type' => 'image/jpeg'
-        ]);
+    /**
+     * Get the file path for a font if it exists.
+     */
+    private function getFontPath(string $fontName): ?string
+    {
+        $path = public_path("fonts/{$fontName}");
+        return file_exists($path) ? $path : null;
     }
 }
