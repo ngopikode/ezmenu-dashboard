@@ -4,7 +4,6 @@ namespace App\Exceptions;
 
 use App\Helpers\TelegramHelper;
 use App\Traits\ApiResponserTrait;
-use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
@@ -47,13 +46,16 @@ class Handler extends ExceptionHandler
                 return $this->handleApiException($e, $request);
             }
 
-            if ($e instanceof Exception) {
-                TelegramHelper::reportToTelegram(
-                    errors: $e,
-                    request: $request,
-                    code: $e->getStatusCode() ?? 500
-                );
-            }
+
+            $statusCode = method_exists($e, 'getStatusCode')
+                ? $e->getStatusCode()
+                : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
+
+            TelegramHelper::reportToTelegram(
+                errors: $e,
+                request: $request,
+                code: $statusCode
+            );
         });
     }
 
