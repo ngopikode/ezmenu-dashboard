@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\MenuController;
 use App\Livewire\Dashboard;
-use App\Livewire\Menu\Index;
+use App\Livewire\Menu\MenuIndex;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,21 +34,23 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))
         Route::get('/menu/{productId}/story/image', [MenuController::class, 'generateStoryImage'])->name('product.story.image');
 
         // --- Rute untuk Dashboard Admin ---
-        Route::middleware('auth:web')->group(function () {
-            Route::get('/dashboard', Dashboard::class)->name('dashboard');
+        Route::middleware('auth:web')
+            ->prefix('dashboard')
+            ->group(function () {
+                Route::get('/', Dashboard::class)->name('dashboard');
 
-            // Menu Management
-            Route::get('/menu', Index::class)->name('menu.index');
+                // Menu Management
+                Route::get('menu', MenuIndex::class)->name('menu.index');
 
-            // Order Management
-            Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
+                // Order Management
+                Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
 
-            // Settings
-            Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
+                // Settings
+                Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
 
-            // Profile
-            Route::view('profile', 'profile')->name('profile');
-        });
+                // Profile
+                Route::view('profile', 'profile')->name('profile');
+            });
 
         // Include auth routes within the subdomain group
         require __DIR__ . '/auth.php';

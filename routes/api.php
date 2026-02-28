@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\CategoryApiController;
-use App\Http\Controllers\Api\ClientApiController;
 use App\Http\Controllers\Api\OrderApiController;
 use App\Http\Controllers\Api\ProductApiController;
 use App\Http\Controllers\Api\RestaurantApiController;

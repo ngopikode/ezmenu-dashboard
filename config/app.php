@@ -70,7 +70,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
@@ -184,9 +184,9 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
-        'Helper' => App\Helpers\Helper::class,
+        // 'Helper' => App\Helpers\Helper::class,
     ])->toArray(),
 
-    'frontend_url_base' => env('APP_FRONTEND_URL_BASE', 'ngopikode.my.id')
+    'frontend_url_base' => env('APP_FRONTEND_URL_BASE', 'pakaiapp.dep')
 
 ];

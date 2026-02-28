@@ -26,5 +26,11 @@ class AppServiceProvider extends ServiceProvider
         if (!$this->app->environment('local')) {
             URL::forceScheme('https');
         }
+
+        // Set app.url dynamically based on the current request host
+        if (!app()->runningInConsole()) {
+            $url = request()->getSchemeAndHttpHost();
+            config(['app.url' => $url]);
+        }
     }
 }

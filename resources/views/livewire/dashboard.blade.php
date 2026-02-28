@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="w-100 w-md-auto">
-            <a href="{{ route('orders.index') }}" wire:navigate
+            <a href="{{ route('orders.index', ['subdomain' => request()->route('subdomain')]) }}" wire:navigate
                class="btn btn-brand rounded-pill px-4 py-2 shadow-sm w-100 d-flex align-items-center justify-content-center gap-2">
                 <i class="bi bi-receipt"></i>
                 <span>Lihat Pesanan</span>
@@ -45,7 +45,7 @@
                     <h5 class="alert-heading fw-bold mb-1 font-serif">Setup Restoran Belum Lengkap</h5>
                     <p class="mb-3 small opacity-75">Informasi restoran Anda belum lengkap. Sistem tidak dapat menerima
                         pesanan sampai profil diatur.</p>
-                    <a href="{{ route('settings.index') }}"
+                    <a href="{{ route('settings.index', ['subdomain' => request()->route('subdomain')]) }}"
                        class="btn btn-dark btn-sm rounded-pill px-4 w-100 w-sm-auto">
                         Atur Restoran Sekarang
                     </a>
@@ -139,7 +139,7 @@
                     <div
                         class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
                         <h6 class="fw-bold text-dark mb-0 font-serif">Pesanan Terbaru</h6>
-                        <a href="{{ route('orders.index') }}"
+                        <a href="{{ route('orders.index', ['subdomain' => request()->route('subdomain')]) }}"
                            class="btn btn-sm btn-outline-secondary rounded-pill px-3">
                             Lihat Semua
                         </a>
@@ -227,7 +227,7 @@
                             <h2 class="fw-bold mb-0 font-serif">{{ $stats['active_products'] }}</h2>
                             <p class="text-white text-opacity-75 mb-4">Item Aktif</p>
 
-                            <a href="{{ route('menu.index') }}"
+                            <a href="{{ route('menu.index', ['subdomain' => request()->route('subdomain')]) }}"
                                class="btn btn-sm btn-light text-brand fw-bold rounded-pill px-3 shadow-sm stretched-link">
                                 Kelola Menu <i class="bi bi-arrow-right ms-1"></i>
                             </a>
@@ -241,7 +241,7 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="list-group list-group-flush">
-                                <a href="{{ route('menu.index') }}"
+                                <a href="{{ route('menu.index', ['subdomain' => request()->route('subdomain')]) }}"
                                    class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-center gap-3 border-0">
                                     <div class="bg-primary bg-opacity-10 text-brand rounded p-2 flex-shrink-0">
                                         <i class="bi bi-plus-lg"></i>
@@ -251,7 +251,7 @@
                                         <small class="text-muted">Buat item produk baru</small>
                                     </div>
                                 </a>
-                                <a href="{{ route('settings.index') }}"
+                                <a href="{{ route('settings.index', ['subdomain' => request()->route('subdomain')]) }}"
                                    class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-center gap-3 border-0">
                                     <div class="bg-info bg-opacity-10 text-info rounded p-2 flex-shrink-0">
                                         <i class="bi bi-qr-code"></i>
@@ -261,7 +261,7 @@
                                         <small class="text-muted">Cetak atau unduh QR</small>
                                     </div>
                                 </a>
-                                <a href="{{ route('settings.index') }}"
+                                <a href="{{ route('settings.index', ['subdomain' => request()->route('subdomain')]) }}"
                                    class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-center gap-3 border-0">
                                     <div class="bg-secondary bg-opacity-10 text-secondary rounded p-2 flex-shrink-0">
                                         <i class="bi bi-gear-fill"></i>

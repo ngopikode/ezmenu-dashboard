@@ -6,6 +6,7 @@ use App\Models\Restaurant;
 use App\Traits\ApiResponserTrait;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class ValidateSubdomain
@@ -28,6 +29,9 @@ class ValidateSubdomain
 
         // Use merge to make it available via $request->input('restaurant') and $request->restaurant
         $request->merge(['restaurant' => $restaurant]);
+
+        // Automatically set the default value for the 'subdomain' parameter in all generated URLs
+        URL::defaults(['subdomain' => $subdomain]);
 
         return $next($request);
     }
