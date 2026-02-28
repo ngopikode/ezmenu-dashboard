@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
             'hero_status_text' => 'Open until 11.00PM',
             'hero_headline' => 'Seruput & Gigit',
             'hero_tagline' => '"StayTune the Healthy People"',
-            'hero_instagram_url' => '#',
+            'hero_instagram_url' => 'https://www.instagram.com/sama.co.id',
 
             // Navbar
             'navbar_brand_text' => 'Sama',
