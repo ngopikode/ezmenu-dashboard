@@ -61,7 +61,7 @@ class MenuController extends Controller
             'image_url' => $this->getProductImageUrl($product),
             'product_url' => $productUrl,
             'share_text' => $this->generateShareText($product, $restaurant),
-            'share_title' => "{$product->name} - {$restaurant->name}"
+            'share_title' => "$product->name - $restaurant->name"
         ]);
     }
 
@@ -76,14 +76,14 @@ class MenuController extends Controller
         $product = $this->getProduct($restaurant, $productId);
 
         // --- CACHING STRATEGY ---
-        $cacheFileName = "stories/{$restaurant->id}/{$product->id}_{$product->updated_at->timestamp}.jpg";
+        $cacheFileName = "stories/$subdomain/{$product->id}_{$product->updated_at->timestamp}.jpg";
         $downloadName = Str::slug($product->name) . '-story.jpg';
 
         if (Storage::disk('public')->exists($cacheFileName)) {
             return $this->downloadStoryImage($cacheFileName, $downloadName);
         }
 
-        $this->clearOldStoryCache($restaurant->id, $product->id);
+        $this->clearOldStoryCache($subdomain, $product->id);
 
         $productImagePath = Storage::disk('public')->path($product->image);
 
@@ -159,16 +159,16 @@ class MenuController extends Controller
         $randomHook = $generalHooks[array_rand($generalHooks)];
         $priceFormatted = 'Rp ' . number_format($product->price, 0, ',', '.');
 
-        $shareText = "{$randomHook}\n\n";
-        $shareText .= "*{$product->name}* @ *{$restaurant->name}*\n";
+        $shareText = "$randomHook\n\n";
+        $shareText .= "*$product->name* @ *$restaurant->name*\n";
 
         if ($product->description) {
-            $shareText .= "_\"{$product->description}\"_\n\n";
+            $shareText .= "_\"$product->description\"_\n\n";
         } else {
             $shareText .= "\n";
         }
 
-        $shareText .= "Harganya cuma *{$priceFormatted}* aja lho. ✨\n\n";
+        $shareText .= "Harganya cuma *$priceFormatted* aja lho. ✨\n\n";
         $shareText .= "Cek selengkapnya atau langsung order di sini ya:\n";
 
         return $shareText;
@@ -177,9 +177,9 @@ class MenuController extends Controller
     /**
      * Clear old cached story images for the product.
      */
-    private function clearOldStoryCache(int $restaurantId, int $productId): void
+    private function clearOldStoryCache(int $subdomain, int $productId): void
     {
-        $directory = "stories/{$restaurantId}";
+        $directory = "stories/$subdomain";
         if (!Storage::disk('public')->exists($directory)) {
             return;
         }
@@ -293,7 +293,7 @@ class MenuController extends Controller
      */
     private function getFontPath(string $fontName): ?string
     {
-        $path = public_path("fonts/{$fontName}");
+        $path = public_path("fonts/$fontName");
         return file_exists($path) ? $path : null;
     }
 }

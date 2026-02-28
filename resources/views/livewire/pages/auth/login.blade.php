@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
+use App\Models\Restaurant;
+use App\Helpers\SubdomainHelper;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
@@ -9,6 +11,18 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')]
 class extends Component {
     public LoginForm $form;
+    public ?Restaurant $restaurant = null;
+
+    /**
+     * Mount the component.
+     */
+    public function mount(): void
+    {
+        $subdomain = SubdomainHelper::getCurrentSubdomain();
+        if ($subdomain) {
+            $this->restaurant = Restaurant::where('subdomain', $subdomain)->first();
+        }
+    }
 
     /**
      * Handle an incoming authentication request.
@@ -28,16 +42,23 @@ class extends Component {
 <div class="card card-login-enterprise border-0">
     <div class="card-body p-4 p-sm-5">
 
-        <!-- Header: Consistent with Landing Page -->
+        <!-- Header: Dynamic based on Restaurant -->
         <div class="text-center mb-5">
             <div
                 class="d-inline-flex align-items-center justify-content-center bg-dark text-white rounded-3 mb-3 shadow-sm"
                 style="width: 48px; height: 48px;">
-                <i class="bi bi-layers-fill fs-5"></i>
+                @if($restaurant && $restaurant->logo)
+                    <img src="{{ Storage::url($restaurant->logo) }}" alt="{{ $restaurant->name }}" class="rounded-3"
+                         style="width: 100%; height: 100%; object-fit: cover;">
+                @else
+                    <i class="bi bi-layers-fill fs-5"></i>
+                @endif
             </div>
-            <h4 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.5px;">EzMenu Portal</h4>
+            <h4 class="fw-bold mb-1" style="color: #0f172a; letter-spacing: -0.5px;">
+                {{ $restaurant ? __('login.title', ['restaurantName' => $restaurant->name]) : __('login.default_title') }}
+            </h4>
             <p class="text-muted small">
-                Sign in to manage <span class="fw-semibold text-dark">NgopiKode Enterprise</span>
+                {{ $restaurant ? __('login.subtitle', ['restaurantName' => $restaurant->name]) : __('login.default_subtitle') }}
             </p>
         </div>
 
@@ -58,9 +79,9 @@ class extends Component {
                        type="email"
                        class="form-control form-control-enterprise @error('form.email') is-invalid @enderror"
                        id="email"
-                       placeholder="name@example.com"
+                       placeholder="{{ __('login.email_label') }}"
                        required autofocus>
-                <label for="email" class="text-muted ps-3">Email Address</label>
+                <label for="email" class="text-muted ps-3">{{ __('login.email_label') }}</label>
                 @error('form.email')
                 <div class="invalid-feedback ps-1 small">{{ $message }}</div>
                 @enderror
@@ -74,10 +95,10 @@ class extends Component {
                                :type="show ? 'text' : 'password'"
                                class="form-control form-control-enterprise rounded-end-0 @error('form.password') is-invalid @enderror"
                                id="password"
-                               placeholder="Password"
+                               placeholder="{{ __('login.password_label') }}"
                                style="border-right: none;"
                                required>
-                        <label for="password" class="text-muted ps-3">Password</label>
+                        <label for="password" class="text-muted ps-3">{{ __('login.password_label') }}</label>
                     </div>
                     <span class="input-group-text bg-white border-start-0 px-3 rounded-end-3"
                           style="border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer;"
@@ -97,14 +118,14 @@ class extends Component {
                            style="cursor: pointer; border-color: #cbd5e1;">
                     <label for="remember" class="form-check-label text-muted small user-select-none"
                            style="cursor: pointer;">
-                        Remember device
+                        {{ __('login.remember_device') }}
                     </label>
                 </div>
 
                 @if (Route::has('password.request'))
                     <a class="text-decoration-none small fw-semibold text-primary"
                        href="{{ route('password.request') }}" wire:navigate>
-                        Forgot Password?
+                        {{ __('login.forgot_password') }}
                     </a>
                 @endif
             </div>
@@ -115,54 +136,36 @@ class extends Component {
                         class="btn btn-enterprise shadow-sm"
                         wire:loading.attr="disabled"
                         wire:target="login">
-                    <span wire:loading.remove wire:target="login">Access Dashboard <i
+                    <span wire:loading.remove wire:target="login">{{ __('login.submit_button') }} <i
                             class="bi bi-arrow-right ms-1"></i></span>
                     <span wire:loading wire:target="login">
                         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Authenticating...
+                        {{ __('login.authenticating') }}
                     </span>
                 </button>
-            </div>
-
-            <!-- Divider -->
-            <div class="d-flex align-items-center mb-4">
-                <hr class="flex-grow-1 m-0" style="color: #e2e8f0;">
-                <span class="px-3 text-muted small" style="font-size: 0.8rem;">or continue with</span>
-                <hr class="flex-grow-1 m-0" style="color: #e2e8f0;">
-            </div>
-
-            <!-- Social Login -->
-            <div class="row g-2 mb-4">
-                <div class="col-6">
-                    <a href="#"
-                       class="btn social-btn w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="18"
-                             height="18">
-                        <span class="small">Google</span>
-                    </a>
-                </div>
-                <div class="col-6">
-                    <a href="#"
-                       class="btn social-btn w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                        <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" width="18"
-                             height="18">
-                        <span class="small">Facebook</span>
-                    </a>
-                </div>
             </div>
 
             <!-- Register Link -->
             <div class="text-center">
                 <p class="text-muted small mb-0">
-                    New to EzMenu Enterprise?
+                    {{ $restaurant ? __('login.new_to_us', ['restaurantName' => $restaurant->name]) : __('login.default_new_to_us') }}
                     <a href="{{ route('register') }}"
                        class="text-primary fw-semibold text-decoration-none"
                        wire:navigate>
-                        Register Outlet
+                        {{ __('login.register_outlet') }}
                     </a>
                 </p>
             </div>
 
         </form>
+
+        <!-- Powered by Footer -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted small mb-0">
+                {{ __('login.powered_by') }} <a href="https://ezmenu.id"
+                                                class="fw-semibold text-decoration-none text-dark">EzMenu</a>
+            </p>
+        </div>
+
     </div>
 </div>
