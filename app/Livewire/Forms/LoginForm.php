@@ -67,7 +67,7 @@ class LoginForm extends Form
             Auth::logout(); // Log the user out immediately
 
             throw ValidationException::withMessages([
-                'form.email' => 'You are trying to log in from an incorrect restaurant.',
+                'form.email' => trans('auth.incorrect_restaurant'),
             ]);
         }
     }

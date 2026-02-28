@@ -146,26 +146,18 @@ class extends Component {
             </div>
 
             <!-- Register Link -->
-            <div class="text-center">
-                <p class="text-muted small mb-0">
-                    {{ $restaurant ? __('login.new_to_us', ['restaurantName' => $restaurant->name]) : __('login.default_new_to_us') }}
-                    <a href="{{ route('register') }}"
-                       class="text-primary fw-semibold text-decoration-none"
-                       wire:navigate>
-                        {{ __('login.register_outlet') }}
-                    </a>
-                </p>
-            </div>
+            {{--            <div class="text-center">--}}
+            {{--                <p class="text-muted small mb-0">--}}
+            {{--                    {{ $restaurant ? __('login.new_to_us', ['restaurantName' => $restaurant->name]) : __('login.default_new_to_us') }}--}}
+            {{--                    <a href="{{ route('register') }}"--}}
+            {{--                       class="text-primary fw-semibold text-decoration-none"--}}
+            {{--                       wire:navigate>--}}
+            {{--                        {{ __('login.register_outlet') }}--}}
+            {{--                    </a>--}}
+            {{--                </p>--}}
+            {{--            </div>--}}
 
         </form>
-
-        <!-- Powered by Footer -->
-        <div class="text-center mt-5 pt-4 border-top">
-            <p class="text-muted small mb-0">
-                {{ __('login.powered_by') }} <a href="https://ezmenu.id"
-                                                class="fw-semibold text-decoration-none text-dark">EzMenu</a>
-            </p>
-        </div>
 
     </div>
 </div>

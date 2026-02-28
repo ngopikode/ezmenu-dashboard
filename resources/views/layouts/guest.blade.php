@@ -33,7 +33,7 @@
     <!-- Minimal Footer -->
     <div class="mt-5 text-center">
         <p class="small text-muted mb-0 opacity-75">
-            &copy; {{ date('Y') }} NgopiKode Enterprise. <br>
+            &copy; {{ date('Y') }} ngopikode Enterprise. <br>
             <span style="font-size: 0.75rem;">Authorized Personnel Only</span>
         </p>
     </div>
