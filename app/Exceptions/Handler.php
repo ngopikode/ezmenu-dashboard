@@ -6,10 +6,12 @@ use App\Helpers\TelegramHelper;
 use App\Traits\ApiResponserTrait;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Random\RandomException;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
@@ -17,16 +19,15 @@ use Throwable;
 /**
  * Class Handler
  *
- * Centralized exception handling with API response standardization.
- *
- * @package App\Exceptions
+ * Centralized exception handling with API response standardization
+ * and production-grade Telegram reporting.
  */
 class Handler extends ExceptionHandler
 {
     use ApiResponserTrait;
 
     /**
-     * The list of the inputs that are never flashed to the session on validation exceptions.
+     * Inputs that are never flashed for validation exceptions.
      *
      * @var array<int, string>
      */
@@ -37,37 +38,47 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * Register the exception handling callbacks for the application.
+     * Exceptions that should NOT be reported to Telegram.
+     *
+     * @var array<int, string>
+     */
+    protected array $dontReportToTelegram = [
+        AuthenticationException::class,
+        ValidationException::class,
+        NotFoundHttpException::class,
+        MethodNotAllowedHttpException::class,
+    ];
+
+    /**
+     * Register exception handling callbacks.
      */
     public function register(): void
     {
         $this->renderable(function (Throwable $e, Request $request) {
+
+            // =========================
+            // HANDLE API REQUEST
+            // =========================
             if ($request->is('api/*')) {
                 return $this->handleApiException($e, $request);
             }
 
+            // =========================
+            // REPORT WEB ERROR TO TELEGRAM
+            // =========================
+            $this->reportToTelegramIfNeeded($e, $request);
 
-            $statusCode = method_exists($e, 'getStatusCode')
-                ? $e->getStatusCode()
-                : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
-
-            TelegramHelper::reportToTelegram(
-                errors: $e,
-                request: $request,
-                code: $statusCode
-            );
+            // Let Laravel handle normal web rendering
+            return null;
         });
     }
 
     /**
-     * Determine the type of exception and return the appropriate JSON response.
+     * Handle API exceptions with standardized JSON response.
      *
-     * @param Throwable $e
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      * @throws RandomException
      */
-    private function handleApiException(Throwable $e, Request $request)
+    private function handleApiException(Throwable $e, Request $request): JsonResponse
     {
         if ($e instanceof ValidationException) {
             return $this->failResponse(
@@ -101,15 +112,67 @@ class Handler extends ExceptionHandler
             );
         }
 
-        $statusCode = method_exists($e, 'getStatusCode')
-            ? $e->getStatusCode()
-            : ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
+        $statusCode = $this->resolveStatusCode($e);
+
+        // Only report serious API errors (>=500)
+        if ($statusCode >= 500) {
+            $this->reportToTelegramIfNeeded($e, $request, $statusCode);
+        }
 
         return $this->errorResponse(
             $e,
             'Internal Server Error',
             $statusCode,
             $request
+        );
+    }
+
+    /**
+     * Determine HTTP status code from exception.
+     */
+    private function resolveStatusCode(Throwable $e): int
+    {
+        if ($e instanceof HttpExceptionInterface) {
+            return $e->getStatusCode();
+        }
+
+        return ResponseAlias::HTTP_INTERNAL_SERVER_ERROR;
+    }
+
+    /**
+     * Report error to Telegram safely and selectively.
+     * @throws RandomException
+     */
+    private function reportToTelegramIfNeeded(
+        Throwable $e,
+        Request   $request,
+        ?int      $statusCode = null
+    ): void
+    {
+
+        // Skip in local environment
+        if (app()->environment('local')) {
+            return;
+        }
+
+        // Skip excluded exceptions
+        foreach ($this->dontReportToTelegram as $exceptionClass) {
+            if ($e instanceof $exceptionClass) {
+                return;
+            }
+        }
+
+        $statusCode ??= $this->resolveStatusCode($e);
+
+        // Only report critical errors
+        if ($statusCode < 500) {
+            return;
+        }
+
+        TelegramHelper::reportToTelegram(
+            errors: $e,
+            request: $request,
+            code: $statusCode
         );
     }
 }
