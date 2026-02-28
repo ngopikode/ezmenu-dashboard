@@ -27,10 +27,11 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Set app.url dynamically based on the current request host
         if (!app()->runningInConsole()) {
-            $url = request()->getSchemeAndHttpHost();
-            config(['app.url' => $url]);
+            config([
+                'app.url' => (app()->environment('local') ? 'http' : 'https')
+                    . '://' . request()->getHost()
+            ]);
         }
     }
 }
