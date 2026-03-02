@@ -19,9 +19,7 @@ class extends Component {
     public function mount(): void
     {
         $subdomain = SubdomainHelper::getCurrentSubdomain();
-        if ($subdomain) {
-            $this->restaurant = Restaurant::where('subdomain', $subdomain)->first();
-        }
+        if ($subdomain) $this->restaurant = Restaurant::where('subdomain', $subdomain)->first();
     }
 
     /**

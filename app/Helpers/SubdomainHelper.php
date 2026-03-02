@@ -9,7 +9,7 @@ class SubdomainHelper
      */
     public static function getCurrentSubdomain(): ?string
     {
-        $host = config('app.url');
+        $host = TenantUrl::root();
         if (!$host) return null;
 
         $host = parse_url($host, PHP_URL_HOST);
