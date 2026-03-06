@@ -73,10 +73,7 @@ class ProductApiController extends Controller
         // Wrap with pagination metadata using ApiPaginationTrait
         $data = self::autoPaginateWrapperV2($products, $transformedData);
 
-        return $this->successResponse(
-            data: $data,
-            headers: ['Cache-Control', 'private, max-age=3600']
-        );
+        return $this->successResponse($data);
     }
 
     public function show(Request $request, string $subdomain, string $productId): JsonResponse
@@ -97,9 +94,6 @@ class ProductApiController extends Controller
             'options' => $product->options->pluck('name'),
         ];
 
-        return $this->successResponse(
-            data: $transformedData,
-            headers: ['Cache-Control', 'private, max-age=3600']
-        );
+        return $this->successResponse($transformedData);
     }
 }
