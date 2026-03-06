@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\TenantUrl;
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Restaurant;
 use App\Services\Product\ProductService;
 use App\Traits\ApiPaginationTrait;
@@ -54,7 +55,7 @@ class ProductApiController extends Controller
         $products = $query->paginate($limit);
 
         // Transform data collection
-        $transformedData = $products->getCollection()->transform(function ($product) {
+        $transformedData = $products->getCollection()->transform(function (Product $product) {
             return [
                 'id' => "product-$product->order_column",
                 'product_id' => $product->id,
@@ -64,6 +65,7 @@ class ProductApiController extends Controller
                 'category' => $product->category->name,
                 'image' => $product->image ? TenantUrl::asset($product->image) : null,
                 'type' => $product->type,
+                'is_available' => (bool)$product->is_available,
                 'options' => $product->options->pluck('name'),
             ];
         });

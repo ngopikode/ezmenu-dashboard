@@ -12,24 +12,30 @@ use Livewire\Component;
 class MenuTable extends Component
 {
     public $activeCategoryId = null;
+    public $viewMode = 'grid'; // Default tampilan grid
 
     #[On('menu-saved')]
     #[On('menu-updated')]
     public function refreshTable()
     {
-        // Otomatis refresh computed property
+        // Otomatis men-trigger re-render karena computed property akan dihitung ulang
+    }
+
+    public function switchView($mode)
+    {
+        $this->viewMode = $mode;
     }
 
     #[Computed]
     public function categories()
     {
-        // Eager loading products untuk cegah N+1 Query (Biar web enteng)
+        // Eager Loading 'products' untuk performa maksimal (anti-lelet)
         return Category::with(['products' => function ($query) {
             $query->orderBy('order_column', 'asc');
         }])
             ->where('restaurant_id', Auth::user()->restaurant->id)
             ->orderBy('order_column', 'asc')
-            ->get(); // Mengembalikan Collection agar support ->isEmpty()
+            ->get();
     }
 
     public function toggleAvailability($productId)
@@ -56,7 +62,7 @@ class MenuTable extends Component
             return;
         }
         $category->delete();
-        $this->dispatch('notify', ['type' => 'success', 'message' => 'Kategori dihapus']);
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'Kategori berhasil dihapus']);
     }
 
     public function deleteProduct($id)
