@@ -33,7 +33,8 @@ function initDesktopSidebarToggle() {
 document.addEventListener('DOMContentLoaded', initDesktopSidebarToggle);
 document.addEventListener('livewire:navigated', initDesktopSidebarToggle);
 
-document.addEventListener('livewire:initialized', () => {
+// Pakai 'livewire:navigated' biar script ini di-rebind tiap kali pindah halaman
+document.addEventListener('livewire:navigated', () => {
 
     // ==========================================
     // 1. KONFIGURASI SWEETALERT2 TOAST
@@ -44,20 +45,20 @@ document.addEventListener('livewire:initialized', () => {
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
-        customClass: {
-            popup: 'colored-toast' // Opsional: untuk styling tambahan jika diperlukan
-        },
         didOpen: (toast) => {
             toast.addEventListener('mouseenter', Swal.stopTimer);
             toast.addEventListener('mouseleave', Swal.resumeTimer);
         }
     });
 
-    // Mendengarkan perintah trigger 'notify' dari backend (Livewire)
+    // Gunakan sintaks Livewire.on yang baru untuk v3
     Livewire.on('notify', (event) => {
+        // Di Livewire 3, data event biasanya dibungkus array/object,
+        // pastikan aksesnya bener (biasanya event[0])
+        const data = Array.isArray(event) ? event[0] : event;
         Toast.fire({
-            icon: event[0].type || 'success',
-            title: event[0].message
+            icon: data.type || 'success',
+            title: data.message
         });
     });
 
@@ -65,33 +66,37 @@ document.addEventListener('livewire:initialized', () => {
     // 2. KONFIGURASI GLOBAL LOADER
     // ==========================================
     const loader = document.getElementById('global-loader');
+    if (!loader) return; // Guard clause biar gak error kalau element gak ada
 
-    // 1. Dengerin Akses ke Server (Method Call)
+    // Gunakan Livewire.hook di dalam navigated agar tetap terdaftar
     Livewire.hook('commit', ({commit, succeed, fail}) => {
+        // Tambahkan 'loadProducts' atau method lain yang dirasa berat
         const heavyActions = ['save', 'deleteProduct', 'deleteCategory'];
-        if (commit.calls.some(call => heavyActions.includes(call.method))) {
+
+        const isHeavy = commit.calls.some(call => heavyActions.includes(call.method));
+
+        if (isHeavy) {
             showLoader();
-            succeed(hideLoader);
-            fail(hideLoader);
+            succeed(() => hideLoader());
+            fail(() => hideLoader());
         }
     });
 
-    // 2. Dengerin Teriakan Dispatch (Manual Dispatch Listener)
-    // Pas ada dispatch 'openModal', langsung paksa munculin loader
-    window.addEventListener('openModal', () => {
-        showLoader();
-    });
-
-    // 3. Sembunyiin Loader pas Modal udah muncul (Pake event dari Alpine/Bootstrap)
-    window.addEventListener('show-bootstrap-modal', () => {
-        hideLoader();
-    });
+    // Listener manual untuk dispatch modal
+    window.addEventListener('openModal', () => showLoader());
+    window.addEventListener('show-bootstrap-modal', () => hideLoader());
 
     function showLoader() {
-        loader.classList.replace('d-none', 'd-flex');
+        if (loader) {
+            loader.classList.remove('d-none');
+            loader.classList.add('d-flex');
+        }
     }
 
     function hideLoader() {
-        loader.classList.replace('d-flex', 'd-none');
+        if (loader) {
+            loader.classList.remove('d-flex');
+            loader.classList.add('d-none');
+        }
     }
 });
