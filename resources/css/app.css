@@ -4,63 +4,64 @@
 
 /* --- 1. Definisi Variabel & Bootstrap Overrides --- */
 :root {
-    /* --- Elegant, Earthy Brand Colors --- */
-    --brand-color: #A45D21; /* A warm, earthy brown/orange */
-    --brand-dark: #8C4E1A; /* A slightly darker shade for hover */
-    --brand-rgb: 164, 93, 33;
+    /* --- Coffee Vibes Brand Colors --- */
+    --brand-espresso: #4A2E1B; /* Deep Espresso Brown (Primary) */
+    --brand-caramel: #C7823B; /* Rich Caramel (Accent/Hover) */
+    --brand-mocha: #8C5A35; /* Mocha Brown (Secondary) */
+    --brand-latte: #F5F0EB; /* Light Latte (Body Background) */
+
+    --brand-color: var(--brand-espresso);
+    --brand-dark: var(--brand-mocha);
+    --brand-rgb: 74, 46, 27; /* Espresso RGB */
 
     /* --- Fonts --- */
     --font-sans: 'Inter', sans-serif;
-    --font-serif: 'Plus Jakarta Sans', sans-serif; /* Modern sans for headings */
+    --font-serif: 'Plus Jakarta Sans', sans-serif;
 
-    /* --- Default Light Mode Variables (Soft & Elegant) --- */
-    --ezmenu-bg-body: #FBFBFA; /* Warm, very light off-white */
+    /* --- Default Light Mode Variables (Latte Theme) --- */
+    --ezmenu-bg-body: var(--brand-latte);
     --ezmenu-bg-sidebar: #FFFFFF;
     --ezmenu-bg-card: #FFFFFF;
-    --ezmenu-bg-navbar: rgba(251, 251, 250, 0.85); /* Matches body bg with alpha */
+    --ezmenu-bg-navbar: rgba(245, 240, 235, 0.9); /* Translucent Latte */
 
-    --ezmenu-text-main: #334155; /* Slate 700 - Soft black */
-    --ezmenu-text-muted: #64748B; /* Slate 500 */
+    --ezmenu-text-main: #2C1A0E; /* Dark Roast (Soft black/brown) */
+    --ezmenu-text-muted: #806A58; /* Muted Brown */
 
-    --ezmenu-border-color: #F1F5F9; /* Slate 100 - Very subtle */
-    --ezmenu-hover-bg: rgba(164, 93, 33, 0.05); /* Faint brand color */
+    --ezmenu-border-color: #E6DCD1; /* Faint Coffee Stain */
+    --ezmenu-hover-bg: rgba(199, 130, 59, 0.08); /* Faint Caramel */
 
     /* =========================================
        BOOTSTRAP OVERRIDES (LIGHT MODE)
     ========================================= */
     --bs-primary: var(--brand-color);
     --bs-primary-rgb: var(--brand-rgb);
-
     --bs-body-bg: var(--ezmenu-bg-body);
     --bs-body-color: var(--ezmenu-text-main);
-
-    --bs-link-color: var(--brand-color);
-    --bs-link-hover-color: var(--brand-dark);
-
+    --bs-link-color: var(--brand-caramel);
+    --bs-link-hover-color: var(--brand-espresso);
     --bs-border-color: var(--ezmenu-border-color);
     --bs-font-sans-serif: var(--font-sans);
 }
 
-/* --- 2. Dark Mode Overrides (Soft & Elegant) --- */
+/* --- 2. Dark Mode Overrides (Roast Theme) --- */
 [data-bs-theme="dark"] {
-    --ezmenu-bg-body: #1C1C1C; /* Near-black */
-    --ezmenu-bg-sidebar: #242424;
-    --ezmenu-bg-card: #2A2A2A;
-    --ezmenu-bg-navbar: rgba(28, 28, 28, 0.85);
+    --ezmenu-bg-body: #16110D; /* Very Dark Roast */
+    --ezmenu-bg-sidebar: #221A14; /* Dark Mocha */
+    --ezmenu-bg-card: #2B2119; /* Slightly Lighter Mocha */
+    --ezmenu-bg-navbar: rgba(22, 17, 13, 0.9);
 
-    --ezmenu-text-main: #EAEAEA; /* Softer than pure white */
-    --ezmenu-text-muted: #A0A0A0;
+    --ezmenu-text-main: #F0E8DD; /* Pale Cream */
+    --ezmenu-text-muted: #A89584; /* Muted Beige */
 
-    --ezmenu-border-color: #3A3A3A;
-    --ezmenu-hover-bg: rgba(164, 93, 33, 0.1);
+    --ezmenu-border-color: #3D3126; /* Dark Brown Border */
+    --ezmenu-hover-bg: rgba(199, 130, 59, 0.15); /* Stronger Caramel Hover */
 
     /* =========================================
        BOOTSTRAP OVERRIDES (DARK MODE)
     ========================================= */
     --bs-body-bg: var(--ezmenu-bg-body);
     --bs-body-color: var(--ezmenu-text-main);
-    --bs-body-bg-rgb: 28, 28, 28;
-
+    --bs-body-bg-rgb: 22, 17, 13;
     --bs-border-color: var(--ezmenu-border-color);
     --bs-card-bg: var(--ezmenu-bg-card);
     --bs-secondary-bg: var(--ezmenu-bg-sidebar);
@@ -99,13 +100,6 @@ body {
     transition: margin 0.3s ease-in-out;
 }
 
-/* Sidebar Toggle Logic (Desktop Only) */
-body.sb-sidenav-toggled #sidebar-wrapper {
-    margin-left: -280px;
-}
-
-/* Mobile styles handled by Offcanvas now */
-
 .list-group-item-action {
     color: var(--ezmenu-text-muted);
     background-color: transparent;
@@ -121,14 +115,19 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 .list-group-item-action:hover {
     background-color: var(--ezmenu-hover-bg);
-    color: var(--brand-color);
+    color: var(--brand-caramel);
 }
 
 .list-group-item-action.active {
-    color: var(--brand-color);
+    color: var(--brand-espresso);
     background: linear-gradient(90deg, var(--ezmenu-hover-bg) 0%, transparent 100%);
-    border-left-color: var(--brand-color);
+    border-left-color: var(--brand-espresso);
     font-weight: 600;
+}
+
+[data-bs-theme="dark"] .list-group-item-action.active {
+    color: var(--brand-caramel);
+    border-left-color: var(--brand-caramel);
 }
 
 /* Navbar Style */
@@ -145,15 +144,16 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 /* --- 6. Form & Inputs --- */
 .form-control, .form-select {
-    border-radius: 0.75rem; /* 12px */
+    border-radius: 0.75rem;
     border: 1px solid var(--ezmenu-border-color);
     background-color: var(--ezmenu-bg-body);
     padding: 0.75rem 1rem;
+    color: var(--ezmenu-text-main);
 }
 
 .form-control:focus, .form-select:focus, .form-check-input:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.15);
+    border-color: var(--brand-caramel);
+    box-shadow: 0 0 0 3px rgba(199, 130, 59, 0.2);
 }
 
 /* Input Background for Dark Mode */
@@ -169,23 +169,32 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 /* --- 7. Components & Utilities --- */
 .btn-brand, .btn-primary {
-    background-color: var(--brand-color);
+    background-color: var(--brand-espresso);
     color: white;
     border: none;
     font-weight: 600;
     transition: all 0.2s ease;
-    box-shadow: 0 4px 12px rgba(var(--brand-rgb), 0.2);
+    box-shadow: 0 4px 12px rgba(74, 46, 27, 0.2);
 }
 
 .btn-brand:hover, .btn-primary:hover {
-    background-color: var(--brand-dark);
+    background-color: var(--brand-caramel);
     color: white;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(var(--brand-rgb), 0.25);
+    box-shadow: 0 6px 16px rgba(199, 130, 59, 0.3);
+}
+
+[data-bs-theme="dark"] .btn-brand, [data-bs-theme="dark"] .btn-primary {
+    background-color: var(--brand-caramel);
+    color: #16110D;
+}
+
+[data-bs-theme="dark"] .btn-brand:hover, [data-bs-theme="dark"] .btn-primary:hover {
+    background-color: #E09A52; /* Lighter caramel */
 }
 
 .text-brand {
-    color: var(--brand-color) !important;
+    color: var(--brand-caramel) !important;
 }
 
 .font-serif {
@@ -195,13 +204,12 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 /* Card Styling */
 .card-auth, .card {
     border: 1px solid var(--ezmenu-border-color);
-    border-radius: 1.25rem; /* 20px */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    border-radius: 1.25rem;
+    box-shadow: 0 8px 24px rgba(74, 46, 27, 0.04); /* Coffee-tinted shadow */
     background: var(--ezmenu-bg-card);
     backdrop-filter: blur(12px);
 }
 
-/* Text Utilities Fixes */
 .text-muted {
     color: var(--ezmenu-text-muted) !important;
 }
@@ -211,7 +219,7 @@ body.sb-sidenav-toggled #sidebar-wrapper {
     background-color: var(--ezmenu-bg-card);
     border: 1px solid var(--ezmenu-border-color);
     border-radius: 0.75rem;
-    box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px -3px rgba(74, 46, 27, 0.1);
 }
 
 .dropdown-item {
@@ -220,21 +228,22 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 
 .dropdown-item:hover {
     background-color: var(--ezmenu-hover-bg);
+    color: var(--brand-caramel);
 }
 
 /* NProgress */
 #nprogress .bar {
-    background: var(--brand-color) !important;
+    background: var(--brand-caramel) !important;
     height: 3px !important;
 }
 
 #nprogress .peg {
-    box-shadow: 0 0 10px var(--brand-color), 0 0 5px var(--brand-color) !important;
+    box-shadow: 0 0 10px var(--brand-caramel), 0 0 5px var(--brand-caramel) !important;
 }
 
 #nprogress .spinner-icon {
-    border-top-color: var(--brand-color) !important;
-    border-left-color: var(--brand-color) !important;
+    border-top-color: var(--brand-caramel) !important;
+    border-left-color: var(--brand-caramel) !important;
 }
 
 /* --- 8. Dark Mode Utility Overrides --- */
@@ -259,5 +268,13 @@ body.sb-sidenav-toggled #sidebar-wrapper {
 }
 
 [data-bs-theme="dark"] .btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
+    filter: invert(1) grayscale(100%) brightness(200%) sepia(50%) hue-rotate(330deg); /* Slight warm tint for dark mode close button */
+}
+
+/* SweetAlert Overrides for Coffee Vibe */
+div:where(.swal2-container) div:where(.swal2-toast) {
+    background-color: var(--ezmenu-bg-card) !important;
+    color: var(--ezmenu-text-main) !important;
+    border: 1px solid var(--ezmenu-border-color) !important;
+    box-shadow: 0 10px 30px rgba(74, 46, 27, 0.1) !important;
 }

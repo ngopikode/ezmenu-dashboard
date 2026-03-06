@@ -9,7 +9,9 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
     @include('layouts.sections.styles')
 
@@ -19,6 +21,16 @@
 </head>
 <body>
 <div id="wrapper">
+    <div id="global-loader"
+         class="d-none justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white"
+         style="z-index: 9999; opacity: 0.8;">
+        <div class="text-center">
+            <div class="spinner-border text-brand" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-dark fw-bold">Memproses Data...</p>
+        </div>
+    </div>
 
     <!-- Desktop Sidebar (Hidden on Mobile) -->
     <div class="d-none d-md-flex">
@@ -26,7 +38,8 @@
     </div>
 
     <!-- Mobile Offcanvas Sidebar -->
-    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel" style="width: 280px;">
+    <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="mobileSidebar"
+         aria-labelledby="mobileSidebarLabel" style="width: 280px;">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title font-serif fw-bold" id="mobileSidebarLabel">{{ config('app.name') }}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>

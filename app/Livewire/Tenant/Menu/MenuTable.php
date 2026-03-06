@@ -5,65 +5,64 @@ namespace App\Livewire\Tenant\Menu;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 class MenuTable extends Component
 {
-    public $categories;
     public $activeCategoryId = null;
 
-    public function mount()
+    #[On('menu-saved')]
+    #[On('menu-updated')]
+    public function refreshTable()
     {
-        $this->refreshData();
+        // Otomatis refresh computed property
     }
 
-    #[On('menu-updated')]
-    public function refreshData()
+    #[Computed]
+    public function categories()
     {
-        $user = Auth::user();
-        $this->categories = Category::where('restaurant_id', $user->restaurant->id)
-            ->with(['products' => function ($q) {
-                $q->with('options')->orderBy('order_column');
-            }])
-            ->orderBy('order_column')
-            ->get();
+        // Eager loading products untuk cegah N+1 Query (Biar web enteng)
+        return Category::with(['products' => function ($query) {
+            $query->orderBy('order_column', 'asc');
+        }])
+            ->where('restaurant_id', Auth::user()->restaurant->id)
+            ->orderBy('order_column', 'asc')
+            ->get(); // Mengembalikan Collection agar support ->isEmpty()
+    }
 
-        if (!$this->activeCategoryId && $this->categories->isNotEmpty()) {
-            $this->activeCategoryId = $this->categories->first()->id;
-        }
+    public function toggleAvailability($productId)
+    {
+        $product = Product::findOrFail($productId);
+        $product->update([
+            'is_available' => !$product->is_available
+        ]);
+
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Status stok berhasil diubah ☕'
+        ]);
     }
 
     public function deleteCategory($id)
     {
-        $category = Category::find($id);
-        if ($category && $category->products()->count() == 0) {
-            $category->delete();
-            $this->refreshData();
+        $category = Category::findOrFail($id);
+        if ($category->products()->count() > 0) {
+            $this->dispatch('notify', [
+                'type' => 'error',
+                'message' => 'Hapus semua produk di kategori ini dulu bos!'
+            ]);
+            return;
         }
-    }
-
-    public function toggleAvailability($id)
-    {
-        $product = Product::find($id);
-        if ($product) {
-            $product->is_available = !$product->is_available;
-            $product->save();
-            $this->refreshData();
-        }
+        $category->delete();
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'Kategori dihapus']);
     }
 
     public function deleteProduct($id)
     {
-        $product = Product::find($id);
-        if ($product) {
-            if ($product->image) {
-                Storage::disk('public')->delete($product->image);
-            }
-            $product->delete();
-            $this->refreshData();
-        }
+        Product::findOrFail($id)->delete();
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'Produk berhasil dibuang']);
     }
 
     public function render()

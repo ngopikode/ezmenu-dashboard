@@ -33,7 +33,7 @@ class extends Component {
 
         Session::regenerate();
 
-        $this->redirectIntended(default: RouteServiceProvider::HOME, navigate: true);
+        $this->redirectRoute('dashboard');
     }
 }; ?>
 

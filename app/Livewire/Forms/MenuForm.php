@@ -7,51 +7,26 @@ use App\Models\Product;
 use App\Traits\CompressesImages;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Rule;
 use Livewire\Form;
 
 class MenuForm extends Form
 {
     use CompressesImages;
 
-    // Category Form
+    // HAPUS SEMUA ATRIBUT #[Rule]
     public $categoryId;
-
-    #[Rule('required|string|max:255')]
     public $categoryName;
 
-    // Product Form
     public $productId;
-
-    #[Rule('required|string|max:255')]
     public $productName;
-
     public $productDescription;
-
-    #[Rule('required|numeric|min:0')]
     public $productPrice;
-
-    #[Rule('nullable|image|max:2048')]
     public $productImage;
-
     public $existingProductImage;
-
-    #[Rule('required|exists:categories,id')]
     public $productCategoryId;
-
     public $productIsAvailable = true;
-
-    #[Rule('required|in:single,multi')]
     public $productType = 'single';
-
     public $productOptions = [];
-
-    public function rules()
-    {
-        return [
-            'productOptions.*.name' => 'required|string|max:255',
-        ];
-    }
 
     public function setCategory(Category $category)
     {
@@ -82,7 +57,10 @@ class MenuForm extends Form
 
     public function saveCategory($isEditing)
     {
-        $this->validateOnly('categoryName');
+        // VALIDASI KHUSUS KATEGORI DI SINI
+        $this->validate([
+            'categoryName' => 'required|string|max:255'
+        ]);
 
         $user = Auth::user();
 
@@ -99,7 +77,15 @@ class MenuForm extends Form
 
     public function saveProduct($isEditing)
     {
-        $this->validate();
+        // VALIDASI KHUSUS PRODUK DI SINI
+        $this->validate([
+            'productName' => 'required|string|max:255',
+            'productPrice' => 'required|numeric|min:0',
+            'productImage' => 'nullable|image|max:2048',
+            'productCategoryId' => 'required|exists:categories,id',
+            'productType' => 'required|in:single,multi',
+            'productOptions.*.name' => 'required|string|max:255',
+        ]);
 
         $user = Auth::user();
         $imagePath = $this->existingProductImage;
