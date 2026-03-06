@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\MenuController;
-use App\Livewire\Dashboard;
-use App\Livewire\Menu\MenuIndex;
+use App\Livewire\Tenant\Dashboard\DashboardIndex;
+use App\Livewire\Tenant\Menu\MenuManager;
+use App\Livewire\Tenant\Order\OrderManager;
+use App\Livewire\Tenant\Profile\UserProfile;
+use App\Livewire\Tenant\Settings\RestaurantSettings;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,7 +22,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome')->name('welcome');
 
 // --- Rute untuk Dashboard Admin dan Rich Preview ---
-// Ini akan menangani domain seperti: subdomain.ngopikode.my.id
+// Ini akan menangani domain seperti: subdomain.pakaiapp.online
 Route::domain('{subdomain}.' . config('app.frontend_url_base'))
     ->middleware('validateSubdomain')
     ->group(function () {
@@ -40,19 +43,19 @@ Route::prefix('dashboard')->group(function () {
     Route::middleware('auth:web')
         ->group(function () {
             // Dashboard
-            Route::get('/', Dashboard::class)->name('dashboard');
+            Route::get('/', DashboardIndex::class)->name('dashboard');
 
             // Menu Management
-            Route::get('menu', MenuIndex::class)->name('menu.index');
+            Route::get('menu', MenuManager::class)->name('menu.index');
 
             // Order Management
-            Route::get('/orders', \App\Livewire\Orders\Index::class)->name('orders.index');
+            Route::get('/orders', OrderManager::class)->name('orders.index');
 
             // Settings
-            Route::get('/settings', \App\Livewire\Settings\Index::class)->name('settings.index');
+            Route::get('/settings', RestaurantSettings::class)->name('settings.index');
 
             // Profile
-            Route::view('profile', 'profile')->name('profile');
+            Route::get('/profile', UserProfile::class)->name('profile');
 
             // Include auth routes within the subdomain group
         });

@@ -7,19 +7,25 @@ use Livewire\Component;
 
 class ThemeToggle extends Component
 {
-    public $themeMode;
+    public $themeMode = 'light';
 
     public function mount()
     {
-        $this->themeMode = Auth::user()->theme_mode ?? 'light';
+        $user = Auth::user();
+        if ($user) {
+            $this->themeMode = $user->theme_mode ?? 'light';
+        }
     }
 
     public function toggleTheme()
     {
+        $this->themeMode = $this->themeMode === 'light' ? 'dark' : 'light';
+
         $user = Auth::user();
-        $this->themeMode = ($this->themeMode === 'light') ? 'dark' : 'light';
-        $user->theme_mode = $this->themeMode;
-        $user->save();
+        if ($user) {
+            $user->theme_mode = $this->themeMode;
+            $user->save();
+        }
 
         $this->dispatch('theme-updated', theme: $this->themeMode);
     }
