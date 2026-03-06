@@ -15,9 +15,9 @@
 
     @include('layouts.sections.styles')
 
-    @stack('custom-styles')
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{ $customStyles ?? '' }}
 </head>
 <body>
 <div id="wrapper">
@@ -59,15 +59,8 @@
 
     @include('layouts.sections.scripts')
 
-    @stack('custom-scripts')
+    {{ $customScripts ?? '' }}
 
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('theme-updated', (event) => {
-                document.documentElement.setAttribute('data-bs-theme', event.theme);
-            });
-        });
-    </script>
 </div>
 </body>
 </html>

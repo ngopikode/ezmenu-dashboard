@@ -11,6 +11,30 @@ document.addEventListener('livewire:navigating', () => NProgress.start());
 document.addEventListener('livewire:navigated', () => NProgress.done());
 
 document.addEventListener('livewire:initialized', () => {
+    Livewire.on('theme-updated', (event) => {
+        document.documentElement.setAttribute('data-bs-theme', event.theme);
+    });
+});
+
+// Desktop sidebar toggle logic
+function initDesktopSidebarToggle() {
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebarToggle) {
+        sidebarToggle.onclick = function (e) {
+            e.preventDefault();
+            document.body.classList.toggle('sb-sidenav-toggled');
+            localStorage.setItem(
+                'sb|sidebar-toggle',
+                document.body.classList.contains('sb-sidenav-toggled').toString()
+            );
+        };
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initDesktopSidebarToggle);
+document.addEventListener('livewire:navigated', initDesktopSidebarToggle);
+
+document.addEventListener('livewire:initialized', () => {
 
     // ==========================================
     // 1. KONFIGURASI SWEETALERT2 TOAST

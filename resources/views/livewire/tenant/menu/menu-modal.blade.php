@@ -171,27 +171,28 @@
             </div>
         </div>
     </div>
+
+    <x-slot name="customScripts">
+
+        <script>
+            document.addEventListener('livewire:initialized', () => {
+                const modalEl = document.getElementById('dynamicMenuModal');
+                const modal = new bootstrap.Modal(modalEl);
+
+                Livewire.on('show-bootstrap-modal', () => {
+                    modal.show();
+                });
+
+                Livewire.on('hide-bootstrap-modal', () => {
+                    modal.hide();
+                });
+
+                modalEl.addEventListener('hidden.bs.modal', () => {
+                    @this.
+                    call('closeModal');
+                });
+            });
+        </script>
+
+    </x-slot>
 </div>
-
-@push('custom-scripts')
-
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            const modalEl = document.getElementById('dynamicMenuModal');
-            const modal = new bootstrap.Modal(modalEl);
-
-            Livewire.on('show-bootstrap-modal', () => {
-                modal.show();
-            });
-
-            Livewire.on('hide-bootstrap-modal', () => {
-                modal.hide();
-            });
-
-            modalEl.addEventListener('hidden.bs.modal', () => {
-                @this.
-                call('closeModal');
-            });
-        });
-    </script>
-@endpush

@@ -99,25 +99,3 @@ new class extends Component {
         </ul>
     </div>
 </nav>
-
-@push('custom-scripts')
-    <script>
-        // Desktop sidebar toggle logic
-        function initDesktopSidebarToggle() {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            if (sidebarToggle) {
-                sidebarToggle.onclick = function (e) {
-                    e.preventDefault();
-                    document.body.classList.toggle('sb-sidenav-toggled');
-                    localStorage.setItem(
-                        'sb|sidebar-toggle',
-                        document.body.classList.contains('sb-sidenav-toggled').toString()
-                    );
-                };
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', initDesktopSidebarToggle);
-        document.addEventListener('livewire:navigated', initDesktopSidebarToggle);
-    </script>
-@endpush
