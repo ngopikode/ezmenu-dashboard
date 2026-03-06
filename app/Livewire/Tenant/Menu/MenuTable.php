@@ -21,16 +21,14 @@ class MenuTable extends Component
     #[On('menu-updated')]
     public function refreshTable()
     {
-        // 1. Refresh isi produk kalau kategorinya lagi kebuka
+        // Pas berhasil simpan/ubah, JANGAN ubah activeCategoryId
+        // Cukup tarik ulang data produknya biar list-nya update
         if ($this->activeCategoryId) {
             $this->loadedProducts = Product::where('category_id', $this->activeCategoryId)
                 ->orderBy('order_column', 'asc')
                 ->get();
         }
-
-        // 2. HAPUS CACHE COMPUTED INI PENTING!
-        // Biar query Category::withCount dihitung ulang dan badge otomatis berubah
-        unset($this->categories);
+        unset($this->categories); // Refresh badge count
     }
 
     public function switchView($mode)
@@ -38,21 +36,19 @@ class MenuTable extends Component
         $this->viewMode = $mode;
     }
 
-    // Fungsi Trigger saat user klik Accordion
     public function loadProducts($categoryId)
     {
-        // Jika kategori yang diklik sama dengan yang sudah terbuka, tutup accordion
-        if ($this->activeCategoryId === $categoryId) {
+        // Kalau yang diklik adalah kategori yang sudah kebuka, baru kita tutup (toggle)
+        if ($this->activeCategoryId == $categoryId) {
             $this->activeCategoryId = null;
-            $this->loadedProducts = []; // Bersihkan memory
-            return;
+            $this->loadedProducts = [];
+        } else {
+            // Kalau klik kategori baru, buka dan load produknya
+            $this->activeCategoryId = $categoryId;
+            $this->loadedProducts = Product::where('category_id', $categoryId)
+                ->orderBy('order_column', 'asc')
+                ->get();
         }
-
-        // Set kategori aktif dan load HANYA produk dari kategori tersebut
-        $this->activeCategoryId = $categoryId;
-        $this->loadedProducts = Product::where('category_id', $categoryId)
-            ->orderBy('order_column', 'asc')
-            ->get();
     }
 
     #[Computed]
@@ -71,10 +67,18 @@ class MenuTable extends Component
         $product = Product::findOrFail($productId);
         $product->update(['is_available' => !$product->is_available]);
 
-        // Refresh data array produk lokal agar tampilan langsung berubah
-        $this->loadProducts($this->activeCategoryId);
+        // FIX: Jangan panggil loadProducts() karena itu fungsi Toggle (bikin nutup).
+        // Cukup tarik ulang datanya saja supaya UI-nya update.
+        if ($this->activeCategoryId) {
+            $this->loadedProducts = Product::where('category_id', $this->activeCategoryId)
+                ->orderBy('order_column', 'asc')
+                ->get();
+        }
 
-        $this->dispatch('notify', ['type' => 'success', 'message' => 'Status stok diubah ☕']);
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Status stok ' . $product->name . ' berhasil diubah ☕'
+        ]);
     }
 
     public function deleteCategory($id)
