@@ -12,7 +12,7 @@ new class extends Component {
     public function logout(Logout $logout): void
     {
         $logout();
-        $this->redirectRoute('dashboard');
+        $this->redirect('/', navigate: true);
     }
 }; ?>
 
@@ -34,7 +34,7 @@ new class extends Component {
             </button>
 
             <h5 class="m-0 font-serif fw-bold d-none d-md-block text-truncate" style="max-width: 300px;">
-                {{ $header ?? 'Restaurant Management' }}
+                {{ $header ?? 'Dashboard' }}
             </h5>
         </div>
 

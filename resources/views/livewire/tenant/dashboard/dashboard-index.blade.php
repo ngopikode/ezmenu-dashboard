@@ -1,33 +1,33 @@
 <div>
-    <x-slot name="customStyles">
-        <style>
-            .tracking-tight {
-                letter-spacing: -0.025em;
-            }
+    @assets
+    <style>
+        .tracking-tight {
+            letter-spacing: -0.025em;
+        }
 
-            .hover-lift:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
-                border-color: var(--brand-color) !important;
-            }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+            border-color: var(--brand-color) !important;
+        }
 
-            .hover-bg-light:hover {
-                background-color: var(--ezmenu-hover-bg) !important;
-            }
+        .hover-bg-light:hover {
+            background-color: var(--ezmenu-hover-bg) !important;
+        }
 
-            .hover-text-brand:hover {
-                color: var(--brand-color) !important;
-            }
+        .hover-text-brand:hover {
+            color: var(--brand-color) !important;
+        }
 
-            .transition-all {
-                transition: all 0.2s ease-in-out;
-            }
+        .transition-all {
+            transition: all 0.2s ease-in-out;
+        }
 
-            .cursor-pointer {
-                cursor: pointer;
-            }
-        </style>
-    </x-slot>
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+    @endassets
 
     <!-- 1. Header & Welcome -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 mb-md-5 gap-3">

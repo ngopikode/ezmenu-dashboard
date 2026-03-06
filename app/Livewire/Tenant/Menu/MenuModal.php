@@ -20,7 +20,7 @@ class MenuModal extends Component
     public $isEditing = false;
     public $categories = [];
 
-    #[On('open-menu-modal')]
+    #[On('openModal')]
     public function openModal($type, $mode, $id = null, $categoryId = null): void
     {
         $this->form->resetForm();

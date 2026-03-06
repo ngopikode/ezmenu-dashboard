@@ -92,6 +92,11 @@ body {
     flex-direction: column;
 }
 
+/* Sidebar Toggle Logic (Desktop Only) */
+body.sb-sidenav-toggled #sidebar-wrapper {
+    margin-left: -280px;
+}
+
 #page-content-wrapper {
     width: 100%;
     flex: 1;

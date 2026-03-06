@@ -1,5 +1,19 @@
 <div>
-    <div class="modal fade" id="dynamicMenuModal" tabindex="-1" aria-hidden="true" wire:ignore.self>
+    <div class="modal fade" id="dynamicMenuModal" tabindex="-1" aria-hidden="true" wire:ignore.self
+         x-data="{ modal: null }"
+         x-init="
+            modal = new bootstrap.Modal($el);
+            $wire.on('show-bootstrap-modal', () => modal.show());
+            $wire.on('hide-bootstrap-modal', () => modal.hide());
+         "
+         x-on:livewire:navigating.window="
+            if(modal) modal.dispose();
+            document.querySelectorAll('.modal-backdrop').forEach(bg => bg.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+         ">
+
         <div class="modal-dialog modal-dialog-centered {{ $modalType === 'product' ? 'modal-lg' : '' }}">
             <div class="modal-content rounded-4 border-0 shadow-lg">
 
@@ -156,14 +170,23 @@
 
                         <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
                             <button type="button" class="btn btn-light rounded-pill px-4 fw-bold border"
-                                    data-bs-dismiss="modal">Batal
+                                    data-bs-dismiss="modal">
+                                Batal
                             </button>
+
                             <button type="submit"
                                     class="btn btn-brand rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2"
-                                    wire:loading.attr="disabled" wire:target="save, form.productImage">
-                                <span wire:loading wire:target="save" class="spinner-border spinner-border-sm"></span>
-                                <i class="bi bi-cloud-check" wire:loading.remove wire:target="save"></i>
-                                Simpan Data
+                                    wire:loading.attr="disabled"
+                                    wire:target="save">
+
+                                <div wire:loading.remove wire:target="save">
+                                    <i class="bi bi-cloud-check"></i> Simpan Data
+                                </div>
+
+                                <div wire:loading wire:target="save">
+                                    <small class="spinner-border spinner-border-sm" aria-hidden="true"></small>
+                                    Menyimpan...
+                                </div>
                             </button>
                         </div>
                     </form>
@@ -171,28 +194,4 @@
             </div>
         </div>
     </div>
-
-    <x-slot name="customScripts">
-
-        <script>
-            document.addEventListener('livewire:initialized', () => {
-                const modalEl = document.getElementById('dynamicMenuModal');
-                const modal = new bootstrap.Modal(modalEl);
-
-                Livewire.on('show-bootstrap-modal', () => {
-                    modal.show();
-                });
-
-                Livewire.on('hide-bootstrap-modal', () => {
-                    modal.hide();
-                });
-
-                modalEl.addEventListener('hidden.bs.modal', () => {
-                    @this.
-                    call('closeModal');
-                });
-            });
-        </script>
-
-    </x-slot>
 </div>

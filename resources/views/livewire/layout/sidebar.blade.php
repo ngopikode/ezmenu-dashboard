@@ -12,7 +12,7 @@ new class extends Component {
     public function logout(Logout $logout): void
     {
         $logout();
-        $this->redirect('/', navigate: true);
+        $this->redirectRoute('dashboard');
     }
 }; ?>
 
@@ -22,8 +22,8 @@ new class extends Component {
         <div class="d-flex flex-column align-items-center">
             <span class="font-script text-brand"
                   style="font-size: 2.2rem; line-height: 1;">{{ config('app.name') }}</span>
-            <small class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 2px;">RESTAURANT
-                DASHBOARD</small>
+            <small class="text-muted fw-bold" style="font-size: 0.65rem; letter-spacing: 2px;">
+                RESTAURANT DASHBOAR</small>
         </div>
     </div>
 

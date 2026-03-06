@@ -16,7 +16,6 @@ document.addEventListener('livewire:initialized', () => {
     });
 });
 
-// Desktop sidebar toggle logic
 function initDesktopSidebarToggle() {
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
@@ -67,21 +66,32 @@ document.addEventListener('livewire:initialized', () => {
     // ==========================================
     const loader = document.getElementById('global-loader');
 
-    Livewire.hook('commit', ({component, commit, respond, succeed, fail}) => {
-        // Hanya munculkan loader jika yang dikerjakan adalah proses simpan atau buka modal besar
-        const heavyActions = ['save', 'openModal', 'deleteProduct'];
-        const isHeavy = commit.calls.some(call => heavyActions.includes(call.method));
-
-        if (isHeavy) {
-            loader.classList.add('d-flex');
-            loader.classList.remove('d-none');
+    // 1. Dengerin Akses ke Server (Method Call)
+    Livewire.hook('commit', ({commit, succeed, fail}) => {
+        const heavyActions = ['save', 'deleteProduct', 'deleteCategory'];
+        if (commit.calls.some(call => heavyActions.includes(call.method))) {
+            showLoader();
+            succeed(hideLoader);
+            fail(hideLoader);
         }
-
-        succeed(() => {
-            queueMicrotask(() => {
-                loader.classList.add('d-none');
-                loader.classList.remove('d-flex');
-            });
-        });
     });
+
+    // 2. Dengerin Teriakan Dispatch (Manual Dispatch Listener)
+    // Pas ada dispatch 'openModal', langsung paksa munculin loader
+    window.addEventListener('openModal', () => {
+        showLoader();
+    });
+
+    // 3. Sembunyiin Loader pas Modal udah muncul (Pake event dari Alpine/Bootstrap)
+    window.addEventListener('show-bootstrap-modal', () => {
+        hideLoader();
+    });
+
+    function showLoader() {
+        loader.classList.replace('d-none', 'd-flex');
+    }
+
+    function hideLoader() {
+        loader.classList.replace('d-flex', 'd-none');
+    }
 });

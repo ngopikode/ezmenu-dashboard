@@ -42,7 +42,10 @@ class MenuForm extends Form
         $this->productPrice = $product->price;
         $this->existingProductImage = $product->image;
         $this->productCategoryId = $product->category_id;
-        $this->productIsAvailable = $product->is_available;
+
+        // FIXNYA DI SINI: Paksa ubah angka 1/0 jadi true/false murni
+        $this->productIsAvailable = (bool)$product->is_available;
+
         $this->productType = $product->type;
         $this->productOptions = $product->options->toArray();
     }

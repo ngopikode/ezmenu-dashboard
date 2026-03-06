@@ -17,21 +17,20 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    {{ $customStyles ?? '' }}
 </head>
 <body>
-<div id="wrapper">
-    <div id="global-loader"
-         class="d-none justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white"
-         style="z-index: 9999; opacity: 0.8;">
-        <div class="text-center">
-            <div class="spinner-border text-brand" style="width: 3rem; height: 3rem;" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p class="mt-2 text-dark fw-bold">Memproses Data...</p>
+<div id="global-loader"
+     class="d-none justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white"
+     style="z-index: 9999; opacity: 0.8;">
+    <div class="text-center">
+        <div class="spinner-border text-brand" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
+        <p class="mt-2 text-dark fw-bold">Memproses Data...</p>
     </div>
+</div>
 
+<div id="wrapper">
     <!-- Desktop Sidebar (Hidden on Mobile) -->
     <div class="d-none d-md-flex">
         <livewire:layout.sidebar elementId="sidebar-wrapper"/>
@@ -56,11 +55,8 @@
             {{ $slot }}
         </main>
     </div>
-
-    @include('layouts.sections.scripts')
-
-    {{ $customScripts ?? '' }}
-
 </div>
+
+@include('layouts.sections.scripts')
 </body>
 </html>
