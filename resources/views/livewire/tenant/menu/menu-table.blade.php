@@ -226,7 +226,7 @@
                                                             style="width: 55px; height: 55px;">
 
                                                         <div class="flex-grow-1 min-w-0 me-2">
-                                                            <h6 class="fw-bold text-dark mb-0 text-truncate small">{{ $product->name }}</h6>
+                                                            <h6 class="fw-bold text-dark mb-0 text-truncate small text-wrap">{{ $product->name }}</h6>
                                                             <span class="text-brand fw-bold"
                                                                   style="font-size: 0.75rem;">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                                                         </div>
