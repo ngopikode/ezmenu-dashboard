@@ -91,6 +91,7 @@ class ProductApiController extends Controller
             'category' => $product->category->name,
             'image' => $product->image ? TenantUrl::asset($product->image) : null,
             'type' => $product->type,
+            'is_available' => (bool)$product->is_available,
             'options' => $product->options->pluck('name'),
         ];
 
