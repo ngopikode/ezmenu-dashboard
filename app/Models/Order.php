@@ -18,6 +18,17 @@ class Order extends Model
         'status',
     ];
 
+    protected static function booted()
+    {
+        static::creating(function ($order) {
+            // Generate Hash 6 digit yang keren untuk pesanan baru
+            // Menggunakan microtime agar probabilitas duplikat hampir nol
+            if (empty($order->order_code)) {
+                $order->order_code = strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 6));
+            }
+        });
+    }
+
     public function restaurant(): BelongsTo
     {
         return $this->belongsTo(Restaurant::class);
