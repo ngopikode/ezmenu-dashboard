@@ -83,16 +83,6 @@ class MenuModal extends Component
         $this->closeModal();
     }
 
-    public function addOption(): void
-    {
-        $this->form->addOption();
-    }
-
-    public function removeOption($index): void
-    {
-        $this->form->removeOption($index);
-    }
-
     public function render()
     {
         return view('livewire.tenant.menu.menu-modal');

@@ -110,7 +110,7 @@
                                                     class="input-group-text border-end-0 rounded-start-pill text-muted small fw-bold">Rp</span>
                                                 <input type="number"
                                                        class="form-control border-start-0 rounded-end-pill {{ $errors->has('form.productPrice') ? 'is-invalid' : '' }}"
-                                                       wire:model.blur="form.productPrice" placeholder="0">
+                                                       wire:model="form.productPrice" placeholder="0">
                                             </div>
                                             @error('form.productPrice') <span
                                                 class="text-danger small ps-3 d-block mt-1">{{ $message }}</span> @enderror
@@ -134,35 +134,39 @@
                                             <label class="form-label small text-muted fw-bold">Tipe Produk</label>
                                             <select class="form-select form-select-sm rounded-pill"
                                                     wire:model="form.productType">
-                                                <option value="single">Single (Tanpa Varian)</option>
+                                                <option value="single">Single (1 Varian)</option>
                                                 <option value="multi">Multi (Pelanggan Pilih Varian)</option>
                                             </select>
                                         </div>
 
-                                        @if(count($form->productOptions) > 0)
-                                            <label class="form-label small text-muted fw-bold mb-2">Daftar
-                                                Varian</label>
-                                            @foreach($form->productOptions as $index => $option)
-                                                <div class="input-group input-group-sm mb-2 shadow-sm"
-                                                     wire:key="opt-{{ $index }}">
+                                        <div x-data="{ options: $wire.entangle('form.productOptions') }">
+
+                                            <label class="form-label small text-muted fw-bold mb-2"
+                                                   x-show="options.length > 0">
+                                                Daftar Varian
+                                            </label>
+
+                                            <template x-for="(option, index) in options" :key="index">
+                                                <div class="input-group input-group-sm mb-2 shadow-sm">
                                                     <input type="text"
                                                            class="form-control rounded-start-pill border-end-0"
-                                                           wire:model.blur="form.productOptions.{{ $index }}.name"
+                                                           x-model="options[index].name"
                                                            placeholder="Contoh: Level Pedas, Ukuran Large...">
                                                     <button
                                                         class="btn btn-white border border-start-0 rounded-end-pill text-danger px-3"
-                                                        type="button" wire:click="removeOption({{ $index }})">
-                                                        <i class="bi bi-x-circle"></i>
+                                                        type="button"
+                                                        @click="options.splice(index, 1)"><i class="bi bi-x-circle"></i>
                                                     </button>
                                                 </div>
-                                            @endforeach
-                                        @endif
+                                            </template>
 
-                                        <button type="button"
-                                                class="btn btn-sm btn-outline-brand rounded-pill w-100 fw-bold mt-1 shadow-sm"
-                                                wire:click="addOption">
-                                            <i class="bi bi-plus-lg me-1"></i> Tambah Varian Produk
-                                        </button>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-brand rounded-pill w-100 fw-bold mt-1 shadow-sm"
+                                                    @click="options.push({ name: '' })"><i
+                                                    class="bi bi-plus-lg me-1"></i> Tambah Varian Produk
+                                            </button>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
