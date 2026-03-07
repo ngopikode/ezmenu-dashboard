@@ -11,23 +11,34 @@ class OrderModal extends Component
 {
     public OrderStatusForm $form;
 
-    public $showDetailModal = false;
     public $selectedOrder = null;
 
-    #[On('open-order-modal')]
+    #[On('openModal')]
     public function openModal($orderId)
     {
-        $this->selectedOrder = Order::with('items.product')->find($orderId);
-        $this->showDetailModal = true;
+        $this->selectedOrder = Order::with('items')->find($orderId);
+        $this->dispatch('show-bootstrap-modal');
     }
 
     public function updateStatus($orderId, $newStatus)
     {
         $order = $this->form->updateStatus($orderId, $newStatus);
+
         if ($order) {
-            $this->selectedOrder = Order::with('items.product')->find($orderId);
+            $this->selectedOrder = Order::with('items')->find($orderId);
             $this->dispatch('order-updated');
+
+            // Jika status selesai atau dibatalkan, tutup modal
+            if (in_array($newStatus, ['completed', 'cancelled'])) {
+                $this->closeModal();
+            }
         }
+    }
+
+    public function closeModal()
+    {
+        $this->dispatch('hide-bootstrap-modal');
+        $this->selectedOrder = null;
     }
 
     public function render()
