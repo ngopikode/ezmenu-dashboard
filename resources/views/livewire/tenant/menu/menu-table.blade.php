@@ -49,12 +49,36 @@
                                 <button wire:click="loadProducts({{ $category->id }})"
                                         class="accordion-button {{ $activeCategoryId == $category->id ? '' : 'collapsed' }} bg-white px-3 px-md-4 py-3 fw-bold text-dark shadow-none border-bottom"
                                         type="button">
-                                    <i class="bi bi-grid-1x2 me-2 me-md-3 text-brand"></i>
-                                    <span class="text-truncate me-2">{{ $category->name }}</span>
-                                    <small class="badge bg-light text-muted border rounded-pill"
-                                           style="font-size: 0.65rem;">
-                                        {{ $category->products_count }} <span class="d-none d-sm-inline">Produk</span>
-                                    </small>
+
+                                    <div wire:loading.remove
+                                         wire:target="loadProducts({{ $category->id }}), switchView"
+                                         class="w-100 me-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-grid-1x2 me-2 me-md-3 text-brand"></i>
+
+                                            <span class="text-truncate">{{ $category->name }}</span>
+
+                                            <small class="badge bg-light text-muted border rounded-pill ms-auto"
+                                                   style="font-size: 0.65rem;">
+                                                {{ $category->products_count }}
+                                                <span class="d-none d-sm-inline">Produk</span>
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div wire:loading.flex
+                                         wire:target="loadProducts({{ $category->id }}), switchView" class="w-100">
+                                        <div
+                                            class="d-flex align-items-center w-100 me-3">
+                                            <small class="placeholder rounded me-2 me-md-3 bg-secondary opacity-25"
+                                                   style="width: 18px; height: 18px;"></small>
+                                            <small class="placeholder col-5 rounded bg-secondary opacity-25 me-auto"
+                                                   style="height: 20px;"></small>
+                                            <small class="placeholder col-2 rounded-pill bg-secondary opacity-25"
+                                                   style="height: 20px;"></small>
+                                        </div>
+                                    </div>
+
                                 </button>
                             </h2>
 
