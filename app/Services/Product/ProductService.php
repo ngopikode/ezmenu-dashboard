@@ -2,10 +2,10 @@
 
 namespace App\Services\Product;
 
+use App\Helpers\TenantUrl;
 use App\Models\Product;
 use App\Models\Restaurant;
 use App\Services\Service;
-use Illuminate\Support\Facades\Storage;
 
 class ProductService extends Service
 {
@@ -26,6 +26,6 @@ class ProductService extends Service
      */
     public function getProductImageUrl(Product $product): ?string
     {
-        return $product->image ? asset(Storage::url($product->image)) : null;
+        return $product->image ? TenantUrl::asset($product->image) : null;
     }
 }
