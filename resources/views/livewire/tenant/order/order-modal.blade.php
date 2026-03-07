@@ -21,7 +21,7 @@
                     <div class="modal-header bg-light bg-opacity-75 border-bottom-0 px-4 pt-4 pb-3">
                         <div class="w-100 d-flex justify-content-between align-items-start">
                             <div>
-                                <h4 class="fw-bolder text-dark mb-1">Pesanan #{{ $selectedOrder->id }}</h4>
+                                <h4 class="fw-bolder text-dark mb-1">Pesanan #{{ $selectedOrder->order_code }}</h4>
                                 <div class="text-muted small fw-medium">
                                     <i class="bi bi-calendar-event me-1"></i> {{ $selectedOrder->created_at->format('d M Y, H:i') }}
                                     <span class="mx-2">•</span>
