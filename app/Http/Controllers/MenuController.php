@@ -177,7 +177,7 @@ class MenuController extends Controller
             $shareText .= "($shortDesc) ";
         }
 
-        $shareText .= "Harganya cuma $priceFormatted aja. Order praktis tanpa antre di sini: $url";
+        $shareText .= "Harganya cuma $priceFormatted aja. Order praktis di sini: $url";
 
         return $shareText;
     }
