@@ -75,6 +75,23 @@ class MenuController extends Controller
         ]);
     }
 
+    public function shareToStory(Request $request, $subdomain, $productId)
+    {
+        $restaurant = $request->restaurant;
+        $product = $this->productService->getProduct($restaurant, $productId);
+
+        $productUrl = url("/menu/$productId?t=" . time());
+
+        // Panggil fungsi 1 paragraf yang aman buat WA Story tadi
+        $storyText = $this->generateShareText($product, $restaurant, $productUrl);
+
+        // Encode teksnya biar aman masuk ke URL
+        $encodedText = urlencode($storyText);
+
+        // Redirect langsung ke protokol WhatsApp
+        return redirect()->away("https://wa.me/?text=$encodedText");
+    }
+
     /**
      * Men-generate gambar story (JPEG)
      */

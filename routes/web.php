@@ -31,7 +31,7 @@ Route::domain('{subdomain}.' . config('app.frontend_url_base'))
         Route::get('/menu/{productId}', [MenuController::class, 'showProductPreview'])->name('product.preview');
 
         // Halaman Preview Story (HTML)
-        Route::get('/menu/{productId}/story', [MenuController::class, 'shareAsStory'])->name('product.story');
+        Route::get('/menu/{productId}/story', [MenuController::class, 'shareToStory'])->name('product.story');
 
         // Generate Gambar Story (JPEG)
         Route::get('/menu/{productId}/story/image', [MenuController::class, 'generateStoryImage'])->name('product.story.image');
