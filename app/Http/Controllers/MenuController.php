@@ -70,7 +70,7 @@ class MenuController extends Controller
             'product' => $product,
             'image_url' => $this->productService->getProductImageUrl($product),
             'product_url' => $productUrl,
-            'share_text' => $this->generateShareText($product, $restaurant),
+            'share_text' => $this->generateShareText($product, $restaurant, $productUrl),
             'share_title' => "$product->name - $restaurant->name"
         ]);
     }

@@ -75,8 +75,7 @@
     // Data dari Controller (PHP)
     const shareData = {
         title: "{{ addslashes($share_title) }}",
-        text: `{!! json_encode($share_text) !!}`.slice(1, -1), // Hack untuk handle newline dari PHP ke JS string
-        url: "{{ $product_url }}"
+        text: `{!! json_encode($share_text) !!}`.slice(1, -1) // Hack untuk handle newline dari PHP ke JS string
     };
 
     const handleShare = async () => {
