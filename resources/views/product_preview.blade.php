@@ -9,7 +9,7 @@
     <meta property="og:title" content="{{ $product->name }} di {{ $restaurant->name }}"/>
     <meta property="og:description"
           content="Cuma Rp {{ number_format($product->price, 0, ',', '.') }}! {{ $product->description }}"/>
-    <meta property="og:image" content="{{ $image_url }}"/>
+    <meta property="og:image" content="{{ $image_url }}?t={{ time() }}"/>
     <meta property="og:url" content="{{ url()->current() }}"/>
     <meta property="og:type" content="website"/>
     <meta property="og:site_name" content="{{ $restaurant->name }}"/>
