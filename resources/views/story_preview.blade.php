@@ -49,7 +49,7 @@
 
         <!-- Action Buttons -->
         <div class="space-y-3">
-            <button onclick="handleShare()"
+            <button type="button" id="btnShare"
                     class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition transform active:scale-95 flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path
@@ -58,10 +58,10 @@
                 Share ke WhatsApp
             </button>
 
-            <a href="{{ route('product.story.image', ['subdomain' => request()->route('subdomain'), 'productId' => request()->route('productId')]) }}"
-               class="block w-full bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl text-center transition hover:bg-gray-50">
-                Download Gambar Story
-            </a>
+            {{--            <a href="{{ route('product.story.image', ['subdomain' => request()->route('subdomain'), 'productId' => request()->route('productId')]) }}"--}}
+            {{--               class="block w-full bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl text-center transition hover:bg-gray-50">--}}
+            {{--                Download Gambar Story--}}
+            {{--            </a>--}}
 
             <a href="{{ $product_url }}"
                class="block w-full bg-white border-2 border-gray-200 hover:border-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl text-center transition hover:bg-gray-50">
@@ -91,6 +91,8 @@
             window.open(whatsappUrl, '_blank');
         }
     };
+
+    document.getElementById('btnShare').addEventListener('click', handleShare);
 </script>
 </body>
 </html>
