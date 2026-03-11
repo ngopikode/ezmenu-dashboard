@@ -135,31 +135,32 @@ class MenuController extends Controller
     /**
      * Generate the sharing text for the story.
      */
-    private function generateShareText(Product $product, Restaurant $restaurant): string
+    private function generateShareText(Product $product, Restaurant $restaurant, string $url): string
     {
+        // Hook dibuat lebih menyatu dengan kalimat (tanpa enter & markdown berlebihan)
         $generalHooks = [
-            '✨ *Barangkali lagi kepikiran ini...*',
-            '🌟 *Salah satu yang paling sering dicari nih,*',
-            '📍 *Jangan sampai kelewat yang satu ini ya,*',
-            '🍃 *Pilihan pas buat nemenin hari kamu,*',
-            '🤍 *Rekomendasi spesial buat kamu,*',
-            '💡 *Cek deh, siapa tahu kamu suka,*'
+            '✨ Barangkali lagi kepikiran',
+            '🌟 Salah satu menu favorit dari',
+            '📍 Jangan sampai kelewat nikmatnya',
+            '🍃 Pilihan pas buat nemenin harimu:',
+            '🤍 Rekomendasi spesial untukmu:',
+            '💡 Wajib cobain menu andalan ini:'
         ];
 
         $randomHook = $generalHooks[array_rand($generalHooks)];
-        $priceFormatted = 'Rp ' . number_format($product->price, 0, ',', '.');
+        $priceFormatted = 'Rp' . number_format($product->price, 0, ',', '.'); // Tanpa spasi setelah Rp biar lebih ringkas
 
-        $shareText = "$randomHook\n\n";
-        $shareText .= "*$product->name* @ *$restaurant->name*\n";
+        // Bikin format 1 paragraf nyambung ala Shopee
+        $shareText = "$randomHook $product->name di $restaurant->name. ";
 
-        if ($product->description) {
-            $shareText .= "_\"$product->description\"_\n\n";
-        } else {
-            $shareText .= "\n";
+        // Deskripsi dimasukkan dalam kurung biar rapi dan nggak makan banyak baris
+        if (!empty($product->description)) {
+            // Opsional: Limit panjang deskripsi biar teks nggak kepanjangan buat WA bot
+            $shortDesc = \Illuminate\Support\Str::limit($product->description, 50, '...');
+            $shareText .= "($shortDesc) ";
         }
 
-        $shareText .= "Harganya cuma *$priceFormatted* aja lho. ✨\n\n";
-        $shareText .= "Cek selengkapnya atau langsung order di sini ya:\n";
+        $shareText .= "Harganya cuma $priceFormatted aja. Order praktis tanpa antre di sini: $url";
 
         return $shareText;
     }
